@@ -13,13 +13,12 @@
             --button-purple: #4c2d75;
             --text-gray: #94a3b8;
             --font-display: 'Creepster', cursive;
+            --error-red: #ff4444;
         }
 
         body {
             background-color: var(--bg-dark);
-            background-image: 
-                radial-gradient(circle at 50% 50%, #1a2236 0%, #05070a 100%),
-                url('https://www.transparenttextures.com/patterns/stardust.png');
+            background-image: radial-gradient(circle at 50% 50%, #1a2236 0%, #05070a 100%), url('https://www.transparenttextures.com/patterns/stardust.png');
             color: white;
             font-family: 'Nunito', sans-serif;
             margin: 0;
@@ -27,24 +26,20 @@
             justify-content: center;
             min-height: 100vh;
             padding: 20px;
-            overflow-x: hidden;
         }
 
-        .main-container {
-            width: 100%;
-            max-width: 550px;
-            z-index: 1;
-        }
+        .main-container { width: 100%; max-width: 550px; }
 
-        header { text-align: center; margin-bottom: 30px; }
         header h1 {
             font-family: var(--font-display);
             color: var(--primary-yellow);
             font-size: 3.5rem;
+            text-align: center;
             margin: 0;
             text-shadow: 0 0 20px rgba(250, 204, 21, 0.4);
         }
-        .subtitle { color: var(--text-gray); font-size: 0.9rem; letter-spacing: 2px; }
+
+        .subtitle { text-align: center; color: var(--text-gray); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 30px; }
 
         .card-cadastro {
             background: var(--card-bg);
@@ -74,7 +69,7 @@
         }
         .hole { background: black; border-radius: 50%; width: 4px; height: 4px; }
 
-        .input-group { margin-bottom: 18px; }
+        .input-group { margin-bottom: 18px; position: relative; }
         label { display: block; font-size: 0.8rem; margin-bottom: 6px; color: var(--primary-yellow); opacity: 0.8; }
         
         input {
@@ -83,39 +78,21 @@
             background: rgba(0,0,0,0.3); color: white;
             box-sizing: border-box; transition: 0.3s;
         }
-        input:focus { border-color: var(--primary-yellow); background: rgba(0,0,0,0.5); outline: none; }
+        input:focus { border-color: var(--primary-yellow); outline: none; }
+
+        .char-limit { display: block; font-size: 0.7rem; color: var(--text-gray); margin-top: 5px; text-align: right; opacity: 0.6; }
+
+        #tel-error { color: var(--error-red); font-size: 0.75rem; display: none; margin-top: 8px; font-weight: bold; }
 
         .btn-main {
             width: 100%; border: none; padding: 15px; border-radius: 12px;
-            font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase;
+            font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 10px;
         }
 
-        #btn-action { background: var(--primary-yellow); color: black; margin-top: 10px; }
-        #btn-action:hover { filter: brightness(1.2); transform: translateY(-2px); }
+        #btn-action { background: var(--primary-yellow); color: black; }
+        #btn-toggle-list { background: transparent; color: var(--primary-yellow); border: 1px solid var(--primary-yellow); font-size: 0.75rem; opacity: 0.7; }
 
-        #btn-toggle-list {
-            background: transparent; color: var(--primary-yellow);
-            border: 1px solid var(--primary-yellow); margin-top: 15px;
-            font-size: 0.75rem; padding: 10px; opacity: 0.7;
-        }
-        #btn-toggle-list:hover { opacity: 1; background: rgba(250, 204, 21, 0.1); }
-
-     
-        #secao-contatos {
-            display: none;
-            animation: fadeIn 0.5s ease;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .contatos-header {
-            display: flex; justify-content: space-between;
-            align-items: center; margin-bottom: 20px;
-            border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 10px;
-        }
+        #secao-contatos { display: none; margin-top: 20px; }
 
         .contact-item {
             background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
@@ -127,10 +104,8 @@
         .contact-info p { margin: 5px 0 0 0; color: var(--text-gray); font-size: 0.85rem; }
 
         .actions { display: flex; gap: 10px; }
-        .btn-edit { background: var(--button-purple); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; }
-        .btn-del { background: #450a0a; color: #ff4444; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.75rem; }
-        
-        .empty-msg { text-align: center; margin-top: 40px; color: var(--text-gray); opacity: 0.5; }
+        .btn-edit { background: var(--button-purple); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .btn-del { background: #450a0a; color: #ff4444; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -143,22 +118,28 @@
 
         <section class="card-cadastro">
             <div class="card-title">
-                <div class="sew-button"><div class="hole"></div><div class="hole"></div><div class="hole"></div><div class="hole"></div></div>
+                <div class="sew-button"><div class="hole"></div><div class="hole/div><div class="hole"></div><div class="hole"></div></div>
                 CADASTRAR VISITANTE
             </div>
             
             <input type="hidden" id="edit-index" value="-1">
+            
             <div class="input-group">
                 <label>NOME COMPLETO</label>
-                <input type="text" id="nome" placeholder="Quem é você?">
+                <input type="text" id="nome" placeholder="Nome e Sobrenome" maxlength="60">
+                <small class="char-limit">Máximo de 60 caracteres</small>
             </div>
+            
             <div class="input-group">
                 <label>ENDEREÇO</label>
-                <input type="text" id="endereco" placeholder="Onde você mora?">
+                <input type="text" id="endereco" placeholder="Rua, Número, Bairro" maxlength="60">
+                <small class="char-limit">Máximo de 60 caracteres</small>
             </div>
+            
             <div class="input-group">
                 <label>TELEFONE</label>
-                <input type="text" id="telefone" placeholder="(00) 00000-0000">
+                <input type="text" id="telefone" placeholder="(00) 0000-0000" maxlength="14">
+                <small id="tel-error">⚠️ Erro: Use 10 números.</small>
             </div>
             
             <button id="btn-action" class="btn-main">Costurar Contato</button>
@@ -166,13 +147,6 @@
         </section>
 
         <section id="secao-contatos">
-            <div class="contatos-header">
-                <div style="display:flex; align-items:center; gap:10px; color:var(--primary-yellow); font-weight:bold;">
-                    <div class="sew-button"><div class="hole"></div><div class="hole"></div><div class="hole"></div><div class="hole"></div></div>
-                    CONTATOS SALVOS
-                </div>
-                <span id="contador" style="color: var(--text-gray); font-size: 0.8rem;">0 registros</span>
-            </div>
             <div id="lista-contatos"></div>
         </section>
     </div>
@@ -182,68 +156,88 @@
         const btnToggle = document.getElementById('btn-toggle-list');
         const secaoContatos = document.getElementById('secao-contatos');
         const lista = document.getElementById('lista-contatos');
-        const contadorTxt = document.getElementById('contador');
+        const inputTelefone = document.getElementById('telefone');
+        const telError = document.getElementById('tel-error');
         const editIndexInput = document.getElementById('edit-index');
 
-        let contatos = JSON.parse(localStorage.getItem('coraline_v3')) || [];
+        let contatos = JSON.parse(localStorage.getItem('coraline_v3')) ?? [];
+
+        inputTelefone.addEventListener('input', (e) => {
+            let value = e.target.value.replace(/\D/g, "");
+            if (value.length > 10) value = value.slice(0, 10);
+            telError.style.display = "none";
+
+            let formatted = "";
+            if (value.length > 0) {
+                formatted = "(" + value.slice(0, 2);
+                if (value.length > 2) {
+                    formatted += ") " + value.slice(2, 6);
+                    if (value.length > 6) {
+                        formatted += "-" + value.slice(6, 10);
+                    }
+                }
+            }
+            e.target.value = formatted;
+        });
 
         function renderizar() {
-            lista.innerHTML = '';
-            if (contatos.length === 0) {
-                lista.innerHTML = '<div class="empty-msg"><p>Nenhuma memória encontrada...</p></div>';
-                contadorTxt.innerText = '0 registros';
-            } else {
-                contatos.forEach((c, i) => {
-                    const div = document.createElement('div');
-                    div.className = 'contact-item';
-                    div.innerHTML = `
-                        <div class="contact-info">
-                            <strong>${c.nome}</strong>
-                            <p>${c.endereco} • ${c.telefone}</p>
-                        </div>
-                        <div class="actions">
-                            <button class="btn-edit" onclick="prepararEdicao(${i})">Editar</button>
-                            <button class="btn-del" onclick="remover(${i})">Excluir</button>
-                        </div>
-                    `;
-                    lista.appendChild(div);
-                });
-                contadorTxt.innerText = `${contatos.length} registros`;
-            }
+            lista.innerHTML = contatos.length === 0 ? '<p style="text-align:center; opacity:0.5">Nenhuma memória...</p>' : '';
+            contatos.forEach((c, i) => {
+                const div = document.createElement('div');
+                div.className = 'contact-item';
+                div.innerHTML = `
+                    <div class="contact-info"><strong>${c.nome}</strong><p>${c.endereco} • ${c.telefone}</p></div>
+                    <div class="actions">
+                        <button class="btn-edit" onclick="prepararEdicao(${i})">Editar</button>
+                        <button class="btn-del" onclick="remover(${i})">Excluir</button>
+                    </div>`;
+                lista.appendChild(div);
+            });
             localStorage.setItem('coraline_v3', JSON.stringify(contatos));
         }
 
-        btnToggle.onclick = () => {
-            if (secaoContatos.style.display === 'block') {
-                secaoContatos.style.display = 'none';
-                btnToggle.innerText = 'Ver Cadastros Anteriores';
-            } else {
-                secaoContatos.style.display = 'block';
-                btnToggle.innerText = 'Esconder Cadastros';
-                renderizar();
-            }
-        };
-
         btnAction.onclick = () => {
-            const nome = document.getElementById('nome').value;
-            const endereco = document.getElementById('endereco').value;
-            const telefone = document.getElementById('telefone').value;
+            const nome = document.getElementById('nome').value.trim();
+            const endereco = document.getElementById('endereco').value.trim();
+            const telRaw = inputTelefone.value.replace(/\D/g, "");
             const idx = parseInt(editIndexInput.value);
 
-            if(!nome || !endereco || !telefone) return alert("Preencha todos os campos!");
+          
+            const regexRepeticao = /(.)\1{4,}/; 
+            const regexLetras = /^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/;
+            const palavrasNome = nome.split(" ").filter(p => p.length > 1);
 
-            if(idx === -1) {
-                contatos.push({ nome, endereco, telefone });
-            } else {
-                contatos[idx] = { nome, endereco, telefone };
+            if (!nome || !endereco) return alert("Preencha todos os campos!");
+            
+            if (regexRepeticao.test(nome) || regexRepeticao.test(endereco)) {
+                return alert("Não use letras repetidas!");
+            }
+
+            if (!regexLetras.test(nome) || palavrasNome.length < 2) {
+                return alert("Insira seu Nome e Sobrenome (apenas letras).");
+            }
+
+            if (telRaw.length !== 10) {
+                telError.style.display = "block";
+                return;
+            }
+
+            const novoContato = { nome, endereco, telefone: inputTelefone.value };
+            if (idx === -1) contatos.push(novoContato);
+            else {
+                contatos[idx] = novoContato;
                 editIndexInput.value = "-1";
                 btnAction.innerText = "Costurar Contato";
             }
 
             limparCampos();
             renderizar();
-            secaoContatos.style.display = 'block'; 
-            btnToggle.innerText = 'Esconder Cadastros';
+            secaoContatos.style.display = 'block';
+        };
+
+        btnToggle.onclick = () => {
+            secaoContatos.style.display = secaoContatos.style.display === 'block' ? 'none' : 'block';
+            if (secaoContatos.style.display === 'block') renderizar();
         };
 
         function prepararEdicao(i) {
@@ -252,14 +246,11 @@
             document.getElementById('telefone').value = contatos[i].telefone;
             editIndexInput.value = i;
             btnAction.innerText = "Atualizar Contato";
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.scrollTo(0, 0);
         }
 
         function remover(i) {
-            if(confirm("Deseja apagar este contato?")) {
-                contatos.splice(i, 1);
-                renderizar();
-            }
+            if (confirm("Apagar esta memória?")) { contatos.splice(i, 1); renderizar(); }
         }
 
         function limparCampos() {
