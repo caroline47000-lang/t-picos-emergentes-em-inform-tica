@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Página Glassmorphism Pro 🍷</title>
+    
+    <style>
+        
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            transition: background 0.8s ease;
+            overflow: hidden;
+        }
+
+     
+        @keyframes flutuar {
+            0% { transform: translateY(0px); }
+            50% { transform: translateY(-20px); }
+            100% { transform: translateY(0px); }
+        }
+
+        
+        .container {
+            background: rgba(255, 255, 255, 0.1); 
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 25px 45px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+            color: white;
+            animation: flutuar 4s ease-in-out infinite; 
+        }
+
+        h1 { font-size: 2rem; margin-bottom: 10px; min-height: 80px; }
+        p { color: #ccc; }
+
+        .grid-botoes {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin-top: 25px;
+        }
+
+        button {
+            padding: 12px;
+            border: none;
+            border-radius: 12px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: 0.3s;
+        }
+
+        button:hover { transform: scale(1.05); filter: brightness(1.2); }
+
+     
+        .btn-texto { grid-column: span 2; background: #fff; color: #333; }
+        
+   
+        .btn-vinho { background-color: #800020; color: white; }
+        
+        .btn-cyan { background-color: #00d2ff; color: white; }
+        .btn-gold { background-color: #ffd700; color: #333; }
+        .btn-dark { background-color: #1a1a2e; color: white; border: 1px solid #444; }
+
+    </style>
+</head>
+
+<body onload="boasVindas()">
+
+    <div class="container">
+        <div style="font-size: 3rem;">✨</div>
+        <h1 id="frase">Divamos 🧊</h1>
+        <p>Flutuando no espaço!</p>
+
+        <div class="grid-botoes">
+            <button class="btn-texto" onclick="gerarFrase()">Mudar Vibes 🌀</button>
+
+            <button class="btn-vinho" onclick="mudarCor('#800020')">Vinho 🍷</button>
+            <button class="btn-cyan" onclick="mudarCor('#00d2ff')">Ciano 💎</button>
+            <button class="btn-gold" onclick="mudarCor('#ffd700')">Ouro ✨</button>
+            <button class="btn-dark" onclick="mudarCor('#1a1a2e')">Espaço 🌌</button>
+        </div>
+    </div>
+
+    <script>
+        function boasVindas() {
+            alert("Bem vindo,clique em ok e deixe a magica acontecer.");
+        }
+
+        const frases = [
+            "O estilo é tudo! 🕶️",
+            "Sinta a leveza 🧊",
+            "Vermelho vinho é pura classe 🍷",
+            "Sonhe e realize 🎨",
+            "Mantenha a calma e flutue 🎈",
+            "Exploração espacial ativada 🚀",
+            "Seja criativo ✨"
+        ];
+
+        function gerarFrase() {
+            const h1 = document.getElementById('frase');
+            const sorteio = frases[Math.floor(Math.random() * frases.length)];
+            h1.innerText = sorteio;
+        }
+
+        function mudarCor(cor) {
+            document.body.style.background = cor;
+            
+            const container = document.querySelector('.container');
+            container.style.boxShadow = `0 25px 45px rgba(0,0,0,0.4)`;
+        }
+    </script>
+
+</body>
+</html>

@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Mágica 🧪</title>
+    
+    <style>
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(45deg, #1a1a2e, #16213e, #800020);
+            background-size: 400% 400%;
+            animation: gradientBG 10s ease infinite;
+            color: white;
+            overflow: hidden;
+        }
+
+        @keyframes gradientBG {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+   
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            padding: 3rem;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.37);
+            text-align: center;
+            animation: float 5s ease-in-out infinite;
+            width: 350px;
+        }
+
+        h1 { margin-bottom: 20px; font-size: 1.8rem; }
+
+        button {
+            background: #800020; 
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 4px 15px rgba(128, 0, 32, 0.4);
+        }
+
+        button:hover {
+            transform: scale(1.1);
+            background: #a00028;
+        }
+
+        .resultado-box {
+            margin-top: 25px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            display: none; 
+            text-align: left;
+            font-size: 1.1rem;
+            line-height: 1.6;
+        }
+
+        span { font-weight: bold; color: #ffeb3b; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🧮</div>
+        <h1>Calculadora</h1>
+        <p>Clique abaixo para inserir os números</p>
+        
+        <button onclick="executarCalculo()">Iniciar Cálculo 🚀</button>
+
+        <div id="resultado" class="resultado-box">
+            </div>
+    </div>
+
+    <script>
+        function executarCalculo() {
+          
+            let n1 = Number(prompt("Digite o primeiro número:"));
+            let n2 = Number(prompt("Digite o segundo número:"));
+
+            if (isNaN(n1) || isNaN(n2)) {
+                alert("❌ Por favor, digite apenas números válidos!");
+                return;
+            }
+
+            // 2. Realizar as operações
+            let soma = n1 + n2;
+            let multiplicacao = n1 * n2;
+
+            const box = document.getElementById('resultado');
+            box.style.display = 'block'; 
+            
+            box.innerHTML = `
+                ✅ <b>Resultados:</b><br>
+                ➕ A soma é: <span>${soma}</span><br>
+                ✖️ A multiplicação é: <span>${multiplicacao}</span>
+            `;
+        }
+    </script>
+
+</body>
+</html>

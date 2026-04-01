@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Notas 🎓</title>
+    
+    <style>
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+           
+            background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            color: white;
+            overflow: hidden;
+        }
+
+    
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-15px); }
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(15px);
+            -webkit-backdrop-filter: blur(15px);
+            padding: 40px;
+            border-radius: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-shadow: 0 15px 35px rgba(0,0,0,0.4);
+            text-align: center;
+            width: 380px;
+            animation: float 5s ease-in-out infinite;
+        }
+
+        h1 { font-size: 1.8rem; margin-bottom: 20px; }
+
+        button {
+            background: #800020;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            font-size: 1.1rem;
+            font-weight: bold;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+        }
+
+        button:hover {
+            transform: scale(1.05);
+            background: #a00028;
+        }
+
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 20px;
+            display: none; 
+            font-weight: bold;
+            font-size: 1.2rem;
+            transition: all 0.5s;
+        }
+
+        
+        .aprovado { background: rgba(46, 204, 113, 0.3); border: 1px solid #2ecc71; }
+        .recuperacao { background: rgba(241, 196, 15, 0.3); border: 1px solid #f1c40f; }
+        .reprovado { background: rgba(231, 76, 60, 0.3); border: 1px solid #e74c3c; }
+    </style>
+</head>
+<body>
+
+    <div class="glass-card">
+        <div style="font-size: 3rem; margin-bottom: 10px;">🎓</div>
+        <h1>Portal do Aluno</h1>
+        <p>Clique abaixo para calcular a média e verificar o status.</p>
+        
+        <button onclick="calcularMedia()">Verificar Notas 📝</button>
+
+        <div id="resultado">
+            </div>
+    </div>
+
+    <script>
+        function calcularMedia() {
+          
+            let nota1 = Number(prompt("Digite a primeira nota (0-10):"));
+            let nota2 = Number(prompt("Digite a segunda nota (0-10):"));
+
+            if (isNaN(nota1) || isNaN(nota2)) {
+                alert("Por favor, digite apenas números!");
+                return;
+            }
+
+     
+            let media = (nota1 + nota2) / 2;
+
+   
+            const divResult = document.getElementById('resultado');
+            let status = "";
+            let classeCss = "";
+            let emoji = "";
+
+            if (media >= 7) {
+                status = "APROVADO! 🎉";
+                classeCss = "aprovado";
+                emoji = "🚀";
+            } else if (media >= 1.7) {
+                status = "EM RECUPERAÇÃO ⚠️";
+                classeCss = "recuperacao";
+                emoji = "📚";
+            } else {
+                status = "REPROVADO ❌";
+                classeCss = "reprovado";
+                emoji = "📉";
+            }
+
+           
+            divResult.style.display = "block";
+            divResult.className = classeCss; 
+            divResult.innerHTML = `
+                Média: ${media.toFixed(1)} <br>
+                Status: ${status} ${emoji}
+            `;
+        }
+    </script>
+
+</body>
+</html>
