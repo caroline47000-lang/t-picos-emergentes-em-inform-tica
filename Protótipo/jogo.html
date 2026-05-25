@@ -124,19 +124,16 @@
         let canalAbly;
         let salaId = "";
 
-        const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho";
+        const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho"; 
         const ably = new Ably.Realtime(ABLY_KEY);
 
         const urlParams = new URLSearchParams(window.location.search);
         const modo = urlParams.get('modo');
         const salaParam = urlParams.get('sala');
 
-       
         if (modo === 'arbitro' && !salaParam) {
-           
             document.getElementById('telaSetup').classList.remove('hidden');
         } else if (salaParam) {
-           
             salaId = salaParam;
             conectarAoCanal();
         }
@@ -170,8 +167,10 @@
                 document.getElementById('salaCodigoDisplay').textContent = salaId;
                 document.getElementById('tituloPlacar').textContent = "🎛️ Painel Geral do Árbitro";
 
-               
-                const linkAlunos = `https://caroline47000-lang.github.io/t-picos-emergentes-em-inform-tica/jogo.html?sala=${salaId}&modo=publico`;
+                
+                const baseCaminho = window.location.origin + window.location.pathname;
+                const linkAlunos = `${baseCaminho}?sala=${salaId}&modo=publico`;
+                
                 document.getElementById('qrcodeImgContainer').innerHTML = "";
                 new QRCode(document.getElementById('qrcodeImgContainer'), {
                     text: linkAlunos,
@@ -182,7 +181,6 @@
                 document.getElementById('tituloPlacar').textContent = "📢 Tela de Visualização dos Alunos";
             }
 
-           
             canalAbly.subscribe('atualizacao', (msg) => {
                 const dados = msg.data;
                 document.getElementById('modalidadeDisplay').textContent = dados.modalidade;
@@ -194,7 +192,6 @@
                 pontosTimeB = dados.pB;
             });
 
-           
             canalAbly.subscribe('encerrar', () => {
                 alert("A partida foi encerrada pelo árbitro.");
                 window.location.href = 'index.html';
