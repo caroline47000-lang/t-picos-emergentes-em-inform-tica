@@ -4,34 +4,178 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>InfoSport - Login</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&display=swap" rel="stylesheet">
+    
     <style>
         :root {
             --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --primary-hover: #1d4ed8;
+            --bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
             --text-muted: #64748b;
             --border: #e2e8f0;
             --danger: #ef4444;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        header { text-align: center; margin-bottom: 35px; max-width: 650px; }
-        header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
-        header p { color: var(--text-muted); font-size: 1rem; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); width: 100%; max-width: 450px; text-align: center; }
-        h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-        .btn-role { background-color: #f8fafc; border: 2px solid var(--border); color: var(--text-main); }
-        .btn-role.active { border-color: var(--primary); background-color: #eff6ff; color: var(--primary); }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-        .form-group { margin-bottom: 18px; text-align: left; }
-        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
-        .form-group input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; outline: none; }
-        .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 5px; display: none; font-weight: 600; }
+
+        * { 
+            margin: 0; 
+            padding: 0; 
+            box-sizing: border-box; 
+            font-family: 'Inter', sans-serif; 
+        }
+
+        body { 
+            background: radial-gradient(circle at top right, #1e3a8a, #0f172a);
+            color: var(--text-main); 
+            padding: 20px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            justify-content: center; 
+            min-height: 100vh; 
+        }
+
+        header { 
+            text-align: center; 
+            margin-bottom: 30px; 
+            max-width: 500px; 
+        }
+
+        header h1 { 
+            font-size: 3rem; 
+            font-weight: 800; 
+            letter-spacing: -0.03em;
+            background: linear-gradient(to right, #38bdf8, #60a5fa, #a78bfa); 
+            -webkit-background-clip: text; 
+            -webkit-text-fill-color: transparent; 
+            margin-bottom: 8px; 
+        }
+
+        header p { 
+            color: #94a3b8; 
+            font-size: 1rem;
+            font-weight: 400;
+        }
+
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 35px; 
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5); 
+            width: 100%; 
+            max-width: 420px; 
+            text-align: center;
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        h2 { 
+            font-size: 1.4rem; 
+            font-weight: 700; 
+            margin-bottom: 25px; 
+            color: #0f172a;
+            letter-spacing: -0.01em;
+        }
+
+        .btn-group { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 12px; 
+            margin-bottom: 25px; 
+        }
+
+        .btn { 
+            width: 100%; 
+            padding: 14px; 
+            border: none; 
+            border-radius: 12px; 
+            font-weight: 700; 
+            font-size: 0.95rem; 
+            cursor: pointer; 
+            transition: all 0.2s ease; 
+        }
+
+        .btn-role { 
+            background-color: #f1f5f9; 
+            border: 2px solid transparent; 
+            color: #475569; 
+        }
+
+        .btn-role:hover {
+            background-color: #e2e8f0;
+        }
+
+        .btn-role.active { 
+            border-color: var(--primary); 
+            background-color: #eff6ff; 
+            color: var(--primary); 
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.15);
+        }
+
+        .btn-primary { 
+            background-color: var(--primary); 
+            color: white; 
+            box-shadow: 0 4px 14px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover { 
+            background-color: var(--primary-hover); 
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-primary:active {
+            transform: translateY(1px);
+        }
+
+        .form-group { 
+            margin-bottom: 22px; 
+            text-align: left; 
+        }
+
+        .form-group label { 
+            display: block; 
+            font-size: 0.85rem; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .form-group input { 
+            width: 100%; 
+            padding: 14px 16px; 
+            border: 1px solid var(--border); 
+            border-radius: 12px; 
+            font-size: 1rem; 
+            outline: none; 
+            background-color: #f8fafc;
+            color: #0f172a;
+            transition: all 0.2s;
+        }
+
+        .form-group input:focus { 
+            border-color: var(--primary); 
+            background-color: #ffffff;
+            box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1);
+        }
+
+        .error-msg { 
+            color: var(--danger); 
+            font-size: 0.85rem; 
+            margin-top: 8px; 
+            display: none; 
+            font-weight: 600; 
+            background: #fef2f2;
+            padding: 8px 12px;
+            border-radius: 8px;
+            border: 1px solid #fee2e2;
+        }
+
         .hidden { display: none !important; }
     </style>
 </head>
@@ -39,11 +183,11 @@
 
     <header>
         <h1>🏆 InfoSport</h1>
-        <p>Solução Web para Transparência em Eventos Esportivos</p>
+        <p>Placar Esportivo Conectado em Tempo Real</p>
     </header>
 
     <main class="card">
-        <h2>Selecione seu Perfil</h2>
+        <h2>Painel de Acesso</h2>
         
         <div class="btn-group">
             <button id="btnArbitro" class="btn btn-role" onclick="selecionarPerfil('arbitro')">🎛️ Árbitro</button>
@@ -52,20 +196,20 @@
 
         <div id="formArbitro" class="hidden">
             <div class="form-group">
-                <label for="senhaArbitro">Senha de Acesso</label>
-                <input type="password" id="senhaArbitro" placeholder="Digite a senha do painel">
-                <div id="erroSenha" class="error-msg">❌ Senha incorreta! Tente novamente.</div>
+                <label for="senhaArbitro">Senha do Painel</label>
+                <input type="password" id="senhaArbitro" placeholder="Digite a senha secreta">
+                <div id="erroSenha" class="error-msg">❌ Senha inválida! Tente novamente.</div>
             </div>
-            <button class="btn btn-primary" onclick="entrarComoArbitro()">Entrar no Painel</button>
+            <button class="btn btn-primary" onclick="entrarComoArbitro()">Acessar Ferramentas</button>
         </div>
 
         <div id="formAluno" class="hidden">
             <div class="form-group">
-                <label for="codigoSala">Código da Partida</label>
-                <input type="text" id="codigoSala" placeholder="Ex: jogo_12345">
-                <div id="erroSala" class="error-msg">❌ Digite um código de partida válido.</div>
+                <label for="codigoSala">Código do Jogo</label>
+                <input type="text" id="codigoSala" placeholder="Ex: jogo_9876">
+                <div id="erroSala" class="error-msg">❌ Código em branco ou inválido.</div>
             </div>
-            <button class="btn btn-primary" onclick="entrarComoAluno()">Visualizar Placar</button>
+            <button class="btn btn-primary" onclick="entrarComoAluno()">Assistir Partida</button>
         </div>
     </main>
 
