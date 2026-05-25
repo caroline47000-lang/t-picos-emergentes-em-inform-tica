@@ -3,515 +3,269 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MusicBot - Seu DJ Virtual</title>
+    <title>InfoSport - Placar em Tempo Real</title>
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
     <style>
-       
-        @keyframes moverGradiente {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --success: #10b981;
+            --success-hover: #059669;
+            --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --border: #e2e8f0;
         }
 
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; min-height: 100vh; }
+        header { text-align: center; margin-bottom: 35px; max-width: 650px; }
+        header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        header p { color: var(--text-muted); font-size: 1rem; }
+        .container { width: 100%; max-width: 750px; display: grid; gap: 25px; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); }
+        h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
         
-        body {
-            background: linear-gradient(-45deg, #0b2413, #121212, #1db954, #05140b);
-            background-size: 400% 400%;
-            animation: moverGradiente 15s ease infinite;
-            color: #ffffff;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
+      
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; outline: none; }
+        .form-group input:focus { border-color: var(--primary); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
        
-        .chat-container {
-            width: 400px;
-            height: 600px;
-            background-color: rgba(28, 28, 28, 0.95);
-            border-radius: 15px;
-            box-shadow: 0 12px 36px rgba(0,0,0,0.7);
-            display: flex;
-            flex-direction: column;
-            overflow: hidden;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-        }
+        .modalidade-tag { text-align: center; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em; margin-bottom: 15px; }
+        .placar-container { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 25px 40px; }
+        .time-box { flex: 1; text-align: center; }
+        .time-box h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 12px; }
+        .pontos-display { font-size: 4.5rem; font-weight: 800; color: var(--primary); background: white; width: 140px; height: 100px; display: flex; align-items: center; justify-content: center; margin: 0 auto; border-radius: 14px; border: 1px solid var(--border); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05); }
+        .vs { font-size: 1.1rem; font-weight: 700; color: var(--text-muted); padding: 0 20px; }
 
-        /* CABEÇALHO COM AVATAR */
-        .chat-header {
-            background-color: #000000;
-            padding: 15px;
-            display: flex;
-            align-items: center;
-            border-bottom: 1px solid #292929;
-            z-index: 10;
-        }
-
-        .avatar {
-            width: 40px;
-            height: 40px;
-            background-color: #1DB954;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 20px;
-            margin-right: 12px;
-        }
-
-        .bot-info h3 {
-            margin: 0;
-            font-size: 16px;
-            color: #fff;
-        }
-
-        .bot-info p {
-            margin: 0;
-            font-size: 12px;
-            color: #1DB954;
-        }
-
+    
+        .controle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .col-controle { background: #f8fafc; border: 1px solid var(--border); padding: 20px; border-radius: 16px; text-align: center; }
+        .col-controle h4 { font-size: 0.95rem; color: var(--text-muted); margin-bottom: 15px; font-weight: 600; }
         
-        .chat-messages {
-            flex: 1;
-            padding: 15px;
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            scroll-behavior: smooth;
-        }
+        .btn { width: 100%; padding: 12px; margin: 6px 0; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 6px; }
+        .btn-primary { background-color: var(--primary); color: white; margin-top: 10px; }
+        .btn-add { background-color: var(--success); color: white; }
+        .btn-sub { background-color: var(--danger); color: white; }
+        .btn-reset { background-color: #475569; color: white; margin-top: 15px; }
 
-        
-        .chat-messages::-webkit-scrollbar {
-            width: 6px;
-        }
-
-        .chat-messages::-webkit-scrollbar-track {
-            background: rgba(0, 0, 0, 0.2);
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb {
-            background: #404040;
-            border-radius: 10px;
-        }
-
-        .chat-messages::-webkit-scrollbar-thumb:hover {
-            background: #1DB954;
-        }
-
-        .message {
-            max-width: 80%;
-            padding: 10px 14px;
-            border-radius: 15px;
-            font-size: 14px;
-            line-height: 1.4;
-            word-wrap: break-word;
-            animation: fadeIn 0.3s ease-in-out;
-        }
-
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        .message.bot {
-            background-color: #2a2a2a;
-            color: #ffffff;
-            align-self: flex-start;
-            border-bottom-left-radius: 2px;
-        }
-
-        .message.user {
-            background-color: #1DB954;
-            color: #000000;
-            font-weight: 500;
-            align-self: flex-end;
-            border-bottom-right-radius: 2px;
-        }
-
-       
-        .typing-dots {
-            display: flex;
-            gap: 4px;
-            padding: 4px 0;
-            align-items: center;
-        }
-
-        .typing-dots span {
-            width: 6px;
-            height: 6px;
-            background-color: #aaa;
-            border-radius: 50%;
-            animation: balancar 1.4s infinite both;
-        }
-
-        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
-        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
-
-        @keyframes balancar {
-            0%, 80%, 100% { transform: scale(0); }
-            40% { transform: scale(1); }
-        }
-
-       
-        .chat-input-area {
-            padding: 15px;
-            background-color: #121212;
-            border-top: 1px solid #292929;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-            z-index: 10;
-        }
-
-        .options-container {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 8px;
-        }
-
-        .option-btn {
-            background-color: #2a2a2a;
-            color: #fff;
-            border: 1px solid #404040;
-            padding: 8px 12px;
-            border-radius: 20px;
-            cursor: pointer;
-            font-size: 13px;
-            transition: all 0.2s ease-in-out;
-        }
-
-        .option-btn:hover {
-            background-color: #1DB954;
-            color: #000;
-            border-color: #1DB954;
-            transform: scale(1.05);
-        }
-
-        .text-input-container {
-            display: flex;
-            gap: 8px;
-        }
-
-        input[type="text"] {
-            flex: 1;
-            background-color: #2a2a2a;
-            border: 1px solid #404040;
-            padding: 10px 15px;
-            border-radius: 20px;
-            color: #fff;
-            outline: none;
-        }
-
-        input[type="text"]:disabled {
-            background-color: #1c1c1c;
-            color: #777;
-            border-color: #292929;
-            cursor: not-allowed;
-        }
-
-        .send-btn {
-            background-color: #1DB954;
-            border: none;
-            color: #000;
-            padding: 10px 18px;
-            border-radius: 20px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: background-color 0.2s;
-        }
-
-        .send-btn:disabled {
-            background-color: #1c1c1c;
-            color: #777;
-            cursor: not-allowed;
-        }
+        .qrcode-box { margin-top: 20px; padding: 20px; background: #f8fafc; border: 2px dashed var(--border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+        #qrcodeImgContainer { padding: 10px; background: white; border-radius: 10px; }
+        .hidden { display: none !important; }
+        .pop { transform: scale(1.08); transition: transform 0.1s ease; }
+        @media (max-width: 600px) { .placar-container { flex-direction: column; gap: 20px; } .controle-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <div class="chat-container">
-        <div class="chat-header">
-            <div class="avatar">🎧</div>
-            <div class="bot-info">
-                <h3>MusicBot</h3>
-                <p>● Online (Seu DJ Virtual)</p>
-            </div>
-        </div>
+    <header id="siteHeader">
+        <h1>🏆 InfoSport</h1>
+        <p>Seminário de Intervenção: Solução Web para Transparência em Eventos Esportivos</p>
+    </header>
 
-        <div class="chat-messages" id="chatMessages"></div>
-
-        <div class="chat-input-area">
-            <div class="options-container" id="optionsContainer"></div>
-            <div class="text-input-container">
-                <input type="text" id="userInput" placeholder="Escolha uma opção acima ou digite..." disabled />
-                <button class="send-btn" id="sendBtn" onclick="handleSendText()" disabled>Enviar</button>
+    <div class="container">
+        
+        <main id="telaSetup" class="card">
+            <h2>⚙️ Configuração da Nova Partida</h2>
+            <div class="form-group">
+                <label for="inputModalidade">Modalidade Esportiva</label>
+                <input type="text" id="inputModalidade" placeholder="Ex: Futsal Masculino">
             </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputTimeA">Nome do Time A (Casa)</label>
+                    <input type="text" id="inputTimeA" placeholder="Ex: Informática 3º Ano">
+                </div>
+                <div class="form-group">
+                    <label for="inputTimeB">Nome do Time B (Visitante)</label>
+                    <input type="text" id="inputTimeB" placeholder="Ex: Mecânica 2º Ano">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="criarCanalEIniciar()">🚀 Inicializar e Gerar QR Code do Árbitro</button>
+        </main>
+
+        <div id="telaPlacar" class="container hidden">
+            
+            <main class="card">
+                <h2>📺 Tela do Público (Atualiza Automaticamente)</h2>
+                <div id="modalidadeDisplay" class="modalidade-tag">Modalidade</div>
+                <div class="placar-container">
+                    <div class="time-box">
+                        <h3 id="nomeTimeADisplay">Time A</h3>
+                        <div id="displayA" class="pontos-display">0</div>
+                    </div>
+                    <div class="vs">X</div>
+                    <div class="time-box">
+                        <h3 id="nomeTimeBDisplay">Time B</h3>
+                        <div id="displayB" class="pontos-display">0</div>
+                    </div>
+                </div>
+            </main>
+
+            <section id="painelControle" class="card hidden">
+                <h2>🎛️ Painel Secreto do Árbitro</h2>
+                <div class="controle-grid">
+                    <div class="col-controle">
+                        <h4 id="controleLabelA">Pontos Time A</h4>
+                        <button class="btn btn-add" onclick="enviarPontos('A', 1)">+ 1 Ponto</button>
+                        <button class="btn btn-sub" onclick="enviarPontos('A', -1)">- 1 Ponto</button>
+                    </div>
+                    <div class="col-controle">
+                        <h4 id="controleLabelB">Pontos Time B</h4>
+                        <button class="btn btn-add" onclick="enviarPontos('B', 1)">+ 1 Ponto</button>
+                        <button class="btn btn-sub" onclick="enviarPontos('B', -1)">- 1 Ponto</button>
+                    </div>
+                </div>
+                <button class="btn btn-reset" onclick="zerarPartidaGeral()">🔄 Finalizar Partida Geral</button>
+            </section>
+
+            <section id="areaCompartilhar" class="card">
+                <h2>📱 Controle do Árbitro por Celular</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 15px;">
+                    O árbitro deve escanear o código abaixo com o celular. **Apenas quem escanear este código terá os botões de controle!**
+                </p>
+                <div class="qrcode-box">
+                    <div id="qrcodeImgContainer"></div>
+                </div>
+            </section>
         </div>
     </div>
 
     <script>
+        let pontosTimeA = 0;
+        let pontosTimeB = 0;
+        let canalAbly;
+        let salaId = "";
+
         
-        const bancoMusicas = {
-            "Rock_Animado": [
-                { frase: "🎰 O algoritmo sintonizou uma descarga de energia pura!", musica: "Don't Stop Me Now", artista: "Queen 🎸" },
-                { frase: "✨ Batidas processadas! Prepare-se para bater cabeça!", musica: "Back In Black", artista: "AC/DC ⚡" }
-            ],
-            "Rock_Feliz": [
-                { frase: "🎸 Uma vibe clássica pra animar o seu dia!", musica: "You Shook Me All Night Long", artista: "AC/DC ⚡" }
-            ],
-            "Rock_Triste": [
-                { frase: "😢 Sintonizando um clássico mais melancólico para refletir...", musica: "Snuff", artista: "Slipknot 🖤" }
-            ],
-            "Rock_Nostálgico": [
-                { frase: "📻 Viajando direto no túnel do tempo do rock n' roll!", musica: "Sweet Child O' Mine", artista: "Guns N' Roses 🌹" }
-            ],
-            "Pop_Feliz": [
-                { frase: "🎰 Seus níveis de dopamina vão explodir com essa!", musica: "Happy", artista: "Pharrell Williams 🎤" },
-                { frase: "✨ Sintonizando uma vibe solar e ultra positiva!", musica: "Sugar", artista: "Maroon 5 🍭" }
-            ],
-            "Pop_Animado": [
-                { frase: "🔥 Batidas perfeitas para aumentar o som no talo!", musica: "Uptown Funk", artista: "Bruno Mars 🕺" }
-            ],
-            "Pop_Triste": [
-                { frase: "😢 Uma melodia profunda para acompanhar os sentimentos...", musica: "Someone Like You", artista: "Adele 💔" }
-            ],
-            "Pop_Nostálgico": [
-                { frase: "📻 Lembra dessa? Um verdadeiro hino pop das antigas!", musica: "Baby One More Time", artista: "Britney Spears 👑" }
-            ],
-            "Sertanejo_Triste": [
-                { frase: "🎰 Prepare o lenço, o sistema detectou uma sofrência pesada!", musica: "Notificação Preferida", artista: "Zé Neto e Cristiano 🤠" },
-                { frase: "✨ Processando corações partidos... Lá vem pancada!", musica: "De Quem É A Culpa?", artista: "Marília Mendonça 👑" }
-            ],
-            "Sertanejo_Animado": [
-                { frase: "🔥 Sistema configurado para o modo festa no interior!", musica: "Erro Gostoso", artista: "Simone Mendes ✨" }
-            ],
-            "Sertanejo_Feliz": [
-                { frase: "🤠 Som pra curtir com a galera bem alto!", musica: "A Gente Fez Amor", artista: "Gusttavo Lima 🏛️" }
-            ],
-            "Sertanejo_Nostálgico": [
-                { frase: "📻 Aquele modão raiz que mexe com o peito!", musica: "Evidências", artista: "Chitãozinho & Xororó 🎤" }
-            ],
-            "Eletrônica_Animado": [
-                { frase: "⚡ Alerta de drop insano! Sinta o grave bater!", musica: "Hear Me Now", artista: "Alok 🎧" }
-            ],
-            "Eletrônica_Feliz": [
-                { frase: "🥳 Energia lá em cima com as batidas eletrônicas mais limpas!", musica: "Wake Me Up", artista: "Avicii ◢ ◤" }
-            ],
-            "Rap/Trap_Animado": [
-                { frase: "🪙 Ritmo e poesia pesados direto na sua caixa de som!", musica: "MODO SUL", artista: "Matuê 🚀" }
-            ],
-            "Padrao": [
-                { frase: "🎧 Direto das caixas de som para o seu perfil!", musica: "Blinding Lights", artista: "The Weeknd 🚀" },
-                { frase: "🔊 Uma recomendação especial aclimatada para os seus ouvidos!", musica: "Bohemian Rhapsody", artista: "Queen 👑" }
-            ]
-        };
-
-        let dadosUsuario = { nome: "", genero: "", humor: "", epoca: "", idioma: "" };
-        let etapaAtual = 0;
+        const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho"; 
         
-        const chatMessages = document.getElementById("chatMessages");
-        const optionsContainer = document.getElementById("optionsContainer");
-        const userInput = document.getElementById("userInput");
-        const sendBtn = document.getElementById("sendBtn");
-        let indicadorDigitando = null;
 
-        function rolarParaBaixo() {
-            setTimeout(() => {
-                chatMessages.scrollTop = chatMessages.scrollHeight;
-            }, 50);
-        }
+        const ably = new Ably.Realtime(ABLY_KEY);
+        const urlParams = new URLSearchParams(window.location.search);
+        const modoAtual = urlParams.get('modo');
+        const salaUrl = urlParams.get('sala');
 
-        function adicionarMensagem(texto, remetente) {
-            const msgDiv = document.createElement("div");
-            msgDiv.classList.add("message", remetente);
-            msgDiv.innerHTML = texto;
-            chatMessages.appendChild(msgDiv);
-            rolarParaBaixo();
-        }
-
-        function mostrarDigitando() {
-            removerDigitando();
-            indicadorDigitando = document.createElement("div");
-            indicadorDigitando.classList.add("message", "bot");
-            indicadorDigitando.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
-            chatMessages.appendChild(indicadorDigitando);
-            rolarParaBaixo();
-        }
-
-        function removerDigitando() {
-            if (indicadorDigitando && indicadorDigitando.parentNode) {
-                indicadorDigitando.parentNode.removeChild(indicadorDigitando);
-            }
-        }
-
-        function botFalar(texto, tempoEspera = 1500, callback = null) {
-            optionsContainer.innerHTML = "";
-            mostrarDigitando();
+      
+        if (salaUrl) {
+            salaId = salaUrl;
+            canalAbly = ably.channels.get(salaId);
             
-            setTimeout(() => {
-                removerDigitando();
-                adicionarMensagem(texto, "bot");
-                if (callback) callback();
-            }, tempoEspera);
-        }
-
-        function avancarFluxo() {
-            optionsContainer.innerHTML = "";
-            userInput.disabled = true;
-            sendBtn.disabled = true;
-
-            switch(etapaAtual) {
-                case 0:
-                    botFalar("🎧 Olá! Bem-vindo ao <b>MusicBot</b> criado pela Carol e Isabel, o seu DJ virtual! Estou aqui para entender a sua vibe e recomendar a música perfeita. Pronto para começar? 🚀", 1500, () => {
-                        mostrarBotoes(["Bora! ⚡", "Agora não ❌"], (escolha) => {
-                            if(escolha.includes("Agora não")) {
-                                botFalar("Sem problemas! Quando quiser uma boa música, use o botão para reiniciar. Até mais! 👋", 1000, () => {
-                                    mostrarBotaoReiniciar();
-                                });
-                            } else {
-                                etapaAtual = 1;
-                                avancarFluxo();
-                            }
-                        });
-                    });
-                    break;
-
-                case 1:
-                    botFalar("Excelente! Primeiro, como posso te chamar? Digite seu nome abaixo: 👇", 1200, () => {
-                        userInput.disabled = false;
-                        sendBtn.disabled = false;
-                        userInput.placeholder = "Digite seu nome aqui...";
-                        userInput.focus();
-                        rolarParaBaixo();
-                    });
-                    break;
-
-                case 2:
-                    botFalar(`Muito prazer, <b>${dadosUsuario.nome}</b>! Qual gênero musical mais combina com os seus fones de ouvido hoje? 🎸`, 1400, () => {
-                        mostrarBotoes(["Pop 🎤", "Rock 🎸", "Sertanejo 🤠", "Eletrônica ⚡", "Rap/Trap 🪙"], (escolha) => {
-                            dadosUsuario.genero = escolha.split(" ")[0];
-                            etapaAtual = 3;
-                            avancarFluxo();
-                        });
-                    });
-                    break;
-
-                case 3:
-                    botFalar("Música é sentimento! Como está o seu humor ou o seu estado de espírito agora? 🎭", 1200, () => {
-                        mostrarBotoes(["Feliz 🥳", "Triste 😢", "Animado 🔥", "Nostálgico 📻"], (escolha) => {
-                            dadosUsuario.humor = escolha.split(" ")[0];
-                            etapaAtual = 4;
-                            avancarFluxo();
-                        });
-                    });
-                    break;
-
-                case 4:
-                    botFalar("Você prefere viajar no tempo ou quer ouvir os lançamentos mais frescos? ⏳", 1200, () => {
-                        mostrarBotoes(["Anos 80/90 🕺", "Anos 2000 💿", "Atual 🔥"], (escolha) => {
-                            dadosUsuario.epoca = escolha;
-                            etapaAtual = 5;
-                            avancarFluxo();
-                        });
-                    });
-                    break;
-
-                case 5:
-                    botFalar("Para fecharmos os filtros: em qual idioma você prefere curtir o som? 🌐", 1200, () => {
-                        mostrarBotoes(["Português 🇧🇷", "Inglês 🇺🇸", "Tanto faz! 🌍"], (escolha) => {
-                            dadosUsuario.idioma = escolha;
-                            etapaAtual = 6;
-                            avancarFluxo();
-                        });
-                    });
-                    break;
-
-                case 6:
-                    let combinacao = `${dadosUsuario.genero}_${dadosUsuario.humor}`;
-                    let listaOpcoes = bancoMusicas[combinacao] || bancoMusicas["Padrao"];
-                    let sorteio = listaOpcoes[Math.floor(Math.random() * listaOpcoes.length)];
-
-                    let respostaFinal = `
-                        😎 <b>Aí sim, ${dadosUsuario.nome}! Perfil musical processado.</b><br><br>
-                        Análise de Vibe:<br>
-                        🎷 Gênero: <i>${dadosUsuario.genero}</i><br>
-                        🎭 Vibe: <i>${dadosUsuario.humor}</i><br>
-                        ⏳ Época: <i>${dadosUsuario.epoca}</i><br>
-                        🌐 Idioma: <i>${dadosUsuario.idioma}</i><br><br>
-                        ───<br>
-                        🔊 <b>${sorteio.frase}</b><br><br>
-                        ⭐ Música: <b>${sorteio.musica}</b> — de <u>${sorteio.artista}</u> ⭐
-                    `;
-                    
-                    botFalar(respostaFinal, 2000, () => {
-                        setTimeout(() => {
-                            botFalar("Obrigado por usar o <b>MusicBot</b>! 🚀 Quer fazer outra combinação e ouvir outro som? Clique abaixo! 👇", 1500, () => {
-                                mostrarBotaoReiniciar();
-                            });
-                        }, 1000);
-                    });
-                    break;
-            }
-        }
-
-        function mostrarBotoes(listaOpcoes, callback) {
-            optionsContainer.innerHTML = "";
-            listaOpcoes.forEach(opcao => {
-                const btn = document.createElement("button");
-                btn.classList.add("option-btn");
-                btn.innerText = opcao;
-                btn.onclick = () => {
-                    adicionarMensagem(opcao, "user");
-                    callback(opcao);
-                };
-                optionsContainer.appendChild(btn);
-            });
-            rolarParaBaixo();
-        }
-
-        function mostrarBotaoReiniciar() {
-            optionsContainer.innerHTML = "";
-            const btnReset = document.createElement("button");
-            btnReset.classList.add("option-btn");
-            btnReset.style.borderColor = "#1DB954";
-            btnReset.innerHTML = "🔄 Nova Recomendação";
-            btnReset.onclick = () => {
-                chatMessages.innerHTML = "";
-                dadosUsuario = { nome: "", genero: "", humor: "", epoca: "", idioma: "" };
-                etapaAtual = 0;
-                avancarFluxo();
-            };
-            optionsContainer.appendChild(btnReset);
-            rolarParaBaixo();
-        }
-
-        function handleSendText() {
-            const texto = userInput.value.trim();
-            if(texto !== "") {
-                adicionarMensagem(texto, "user");
-                userInput.value = "";
+            document.getElementById('siteHeader').classList.add('hidden');
+            document.getElementById('telaSetup').classList.add('hidden');
+            document.getElementById('telaPlacar').classList.remove('hidden');
+            
+          
+            if (modoAtual === 'arbitro') {
                 
-                if(etapaAtual === 1) {
-                    dadosUsuario.nome = texto;
-                    etapaAtual = 2;
-                    avancarFluxo();
-                }
+                document.getElementById('painelControle').classList.remove('hidden');
+                document.getElementById('areaCompartilhar').classList.add('hidden');
+            } else {
+               
+                document.getElementById('painelControle').classList.add('hidden');
+                document.getElementById('areaCompartilhar').classList.add('hidden');
             }
+
+            
+            canalAbly.subscribe('atualizacao', (mensagem) => {
+                const dados = mensagem.data;
+                document.getElementById('modalidadeDisplay').textContent = dados.modalidade;
+                document.getElementById('nomeTimeADisplay').textContent = dados.timeA;
+                document.getElementById('nomeTimeBDisplay').textContent = dados.timeB;
+                document.getElementById('displayA').textContent = dados.pA;
+                document.getElementById('displayB').textContent = dados.pB;
+                pontosTimeA = dados.pA;
+                pontosTimeB = dados.pB;
+            });
+
+            canalAbly.subscribe('encerrar', () => {
+                window.location.href = window.location.href.split('?')[0];
+            });
         }
 
-        userInput.addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                handleSendText();
-            }
-        });
+        function criarCanalEIniciar() {
+            
+            salaId = "jogo_" + Math.floor(Math.random() * 100000);
+            canalAbly = ably.channels.get(salaId);
 
-        window.onload = avancarFluxo;
+            const mod = document.getElementById('inputModalidade').value.trim() || "Competição";
+            const timeA = document.getElementById('inputTimeA').value.trim() || "Time A";
+            const timeB = document.getElementById('inputTimeB').value.trim() || "Time B";
+
+            document.getElementById('telaSetup').classList.add('hidden');
+            document.getElementById('telaPlacar').classList.remove('hidden');
+            
+            
+            document.getElementById('painelControle').classList.add('hidden'); 
+
+            
+            canalAbly.subscribe('atualizacao', (mensagem) => {
+                const dados = mensagem.data;
+                document.getElementById('displayA').textContent = dados.pA;
+                document.getElementById('displayB').textContent = dados.pB;
+                pontosTimeA = dados.pA;
+                pontosTimeB = dados.pB;
+            });
+
+            canalAbly.subscribe('encerrar', () => {
+                window.location.reload();
+            });
+
+            
+            const urlLimpa = window.location.href.split('?')[0];
+            const linkArbitro = `${urlLimpa}?sala=${salaId}&modo=arbitro`;
+            
+            document.getElementById('modalidadeDisplay').textContent = mod;
+            document.getElementById('nomeTimeADisplay').textContent = timeA;
+            document.getElementById('nomeTimeBDisplay').textContent = timeB;
+
+          
+            setTimeout(() => {
+                canalAbly.publish('atualizacao', { modalidade: mod, timeA: timeA, timeB: timeB, pA: 0, pB: 0 });
+            }, 800);
+
+            
+            document.getElementById('qrcodeImgContainer').innerHTML = "";
+            new QRCode(document.getElementById('qrcodeImgContainer'), {
+                text: linkArbitro,
+                width: 180,
+                height: 180,
+                colorDark : "#0f172a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+        }
+
+        function enviarPontos(time, valor) {
+            const mod = document.getElementById('modalidadeDisplay').textContent;
+            const tA = document.getElementById('nomeTimeADisplay').textContent;
+            const tB = document.getElementById('nomeTimeBDisplay').textContent;
+
+            if (time === 'A') pontosTimeA = Math.max(0, pontosTimeA + valor);
+            if (time === 'B') pontosTimeB = Math.max(0, pontosTimeB + valor);
+
+           
+            canalAbly.publish('atualizacao', {
+                modalidade: mod,
+                timeA: tA,
+                timeB: tB,
+                pA: pontosTimeA,
+                pB: pontosTimeB
+            });
+        }
+
+        function zerarPartidaGeral() {
+            if(confirm("Encerrar partida? Todas as telas voltarão ao início.")) {
+                canalAbly.publish('encerrar', {});
+            }
+        }
     </script>
 </body>
 </html>
