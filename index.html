@@ -30,14 +30,14 @@
         .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); }
         h2 { font-size: 1.15rem; font-weight: 700; margin-bottom: 25px; display: flex; align-items: center; gap: 10px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
         
-       
+     
         .form-group { margin-bottom: 18px; }
         .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
         .form-group input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; outline: none; }
         .form-group input:focus { border-color: var(--primary); }
         .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
 
-        
+       
         .modalidade-tag { text-align: center; font-size: 1rem; font-weight: 700; text-transform: uppercase; color: var(--primary); letter-spacing: 0.05em; margin-bottom: 15px; }
         .placar-container { display: flex; justify-content: space-between; align-items: center; background: #f8fafc; border: 1px solid var(--border); border-radius: 16px; padding: 25px 40px; }
         .time-box { flex: 1; text-align: center; }
@@ -56,8 +56,8 @@
         .btn-sub { background-color: var(--danger); color: white; }
         .btn-reset { background-color: #475569; color: white; margin-top: 15px; }
 
-        .qrcode-box { margin-top: 20px; padding: 20px; background: #f8fafc; border: 2px dashed var(--border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
-        #qrcodeImgContainer { padding: 10px; background: white; border-radius: 10px; }
+        .qrcode-box { margin-top: 20px; padding: 20px; background: #f8fafc; border: 2px dashed var(--border); border-radius: 14px; display: flex; flex-direction: column; align-items: center; gap: 12px; min-height: 200px; justify-content: center;}
+        #qrcodeImgContainer { padding: 10px; background: white; border-radius: 10px; display: inline-block; }
         .hidden { display: none !important; }
         @media (max-width: 600px) { .placar-container { flex-direction: column; gap: 20px; } .controle-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
     </style>
@@ -193,8 +193,8 @@
             document.getElementById('areaCompartilhar').classList.remove('hidden');
             document.getElementById('tituloPlacar').textContent = "🎛️ Tela Oficial do Árbitro";
 
-           
-            const linkAlunos = `https://caroline47000-lang.github.io/?sala=${salaId}&modo=publico`;
+            
+            const linkAlunos = `https://caroline47000-lang.github.io/t-picos-emergentes-em-inform-tica/?sala=${salaId}&modo=publico`;
             
             document.getElementById('modalidadeDisplay').textContent = mod;
             document.getElementById('nomeTimeADisplay').textContent = timeA;
