@@ -3,108 +3,314 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InfoSport - Login</title>
+    <title>InfoSport - Partida</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Orbitron:wght@700;900&display=swap" rel="stylesheet">
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
     <style>
         :root {
             --primary: #2563eb;
-            --primary-dark: #1d4ed8;
-            --bg: #f1f5f9;
-            --card-bg: #ffffff;
-            --text-main: #0f172a;
+            --bg: #0f172a;
+            --card-bg: rgba(255, 255, 255, 0.95);
+            --text-main: #1e293b;
             --text-muted: #64748b;
-            --border: #e2e8f0;
+            --success: #10b981;
+            --success-hover: #059669;
             --danger: #ef4444;
+            --danger-hover: #dc2626;
+            --border: #e2e8f0;
         }
-        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
-        body { background-color: var(--bg); color: var(--text-main); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
-        header { text-align: center; margin-bottom: 35px; max-width: 650px; }
-        header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
-        header p { color: var(--text-muted); font-size: 1rem; }
-        .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); width: 100%; max-width: 450px; text-align: center; }
-        h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
-        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
-        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
-        .btn-role { background-color: #f8fafc; border: 2px solid var(--border); color: var(--text-main); }
-        .btn-role.active { border-color: var(--primary); background-color: #eff6ff; color: var(--primary); }
-        .btn-primary { background-color: var(--primary); color: white; }
-        .btn-primary:hover { background-color: var(--primary-dark); }
-        .form-group { margin-bottom: 18px; text-align: left; }
-        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
-        .form-group input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; outline: none; }
-        .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 5px; display: none; font-weight: 600; }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
+        
+        body { 
+            background: radial-gradient(circle at top right, #1e3a8a, #0f172a);
+            color: var(--text-main); 
+            padding: 30px 15px; 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+            min-height: 100vh; 
+        }
+
+        .container { width: 100%; max-width: 680px; display: grid; gap: 25px; }
+        
+        .card { 
+            background: var(--card-bg); 
+            border-radius: 24px; 
+            padding: 30px; 
+            box-shadow: 0 20px 40px -15px rgba(0, 0, 0, 0.4); 
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+        }
+
+        h2 { 
+            font-size: 1.2rem; 
+            font-weight: 700; 
+            margin-bottom: 20px; 
+            display: flex; 
+            align-items: center; 
+            gap: 10px; 
+            border-bottom: 1px solid var(--border); 
+            padding-bottom: 12px;
+            color: #0f172a;
+        }
+
+       
+        .form-group { margin-bottom: 18px; }
+        .form-group label { display: block; font-size: 0.85rem; font-weight: 600; margin-bottom: 8px; color: #475569; text-transform: uppercase; }
+        .form-group input { width: 100%; padding: 14px 16px; border: 1px solid var(--border); border-radius: 12px; font-size: 1rem; background-color: #f8fafc; outline: none; }
+        .form-group input:focus { border-color: var(--primary); background: white; box-shadow: 0 0 0 4px rgba(37, 99, 235, 0.1); }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+
+       
+        .modalidade-tag { 
+            text-align: center; 
+            font-size: 0.85rem; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            color: white; 
+            background: var(--primary);
+            padding: 6px 16px;
+            border-radius: 50px;
+            display: inline-block;
+            margin: 0 auto 20px auto;
+            letter-spacing: 0.08em;
+        }
+        .center-wrapper { text-align: center; }
+
+        .placar-container { 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            background: #0f172a; 
+            border-radius: 20px; 
+            padding: 30px 20px;
+            color: white;
+            box-shadow: inset 0 4px 12px rgba(0,0,0,0.5);
+        }
+        .time-box { flex: 1; text-align: center; }
+        .time-box h3 { font-size: 1.3rem; font-weight: 700; margin-bottom: 15px; color: #f1f5f9; min-height: 38px; display: flex; align-items: center; justify-content: center;}
+        
+       
+        .pontos-display { 
+            font-family: 'Orbitron', sans-serif;
+            font-size: 4.5rem; 
+            font-weight: 900; 
+            color: #38bdf8; 
+            background: #1e293b; 
+            width: 130px; 
+            height: 95px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            margin: 0 auto; 
+            border-radius: 16px; 
+            border: 2px solid #334155;
+            text-shadow: 0 0 15px rgba(56, 189, 248, 0.4);
+        }
+        .vs { font-family: 'Orbitron', sans-serif; font-size: 1.2rem; font-weight: 700; color: #64748b; padding: 0 10px; }
+
+        /* Controles do Juiz */
+        .controle-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
+        .col-controle { background: #f8fafc; border: 1px solid var(--border); padding: 15px; border-radius: 16px; text-align: center; }
+        .col-controle h4 { font-size: 0.85rem; color: var(--text-muted); margin-bottom: 12px; font-weight: 700; text-transform: uppercase;}
+        
+        .btn { width: 100%; padding: 12px; margin: 5px 0; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 12px rgba(37, 99, 235, 0.2); }
+        .btn-primary:hover { background-color: #1d4ed8; }
+        .btn-add { background-color: var(--success); color: white; }
+        .btn-add:hover { background-color: var(--success-hover); }
+        .btn-sub { background-color: #e2e8f0; color: #475569; }
+        .btn-sub:hover { background-color: #cbd5e1; }
+        .btn-reset { background-color: #64748b; color: white; margin-top: 15px; }
+        .btn-reset:hover { background-color: #475569; }
+
+        .qrcode-box { margin-top: 15px; padding: 20px; background: #f8fafc; border: 2px dashed #cbd5e1; border-radius: 16px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        #qrcodeImgContainer { padding: 12px; background: white; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.05); }
+        .codigo-sala-destaque { font-family: 'Orbitron', sans-serif; font-size: 1.4rem; font-weight: 700; color: var(--primary); background: #eff6ff; padding: 6px 20px; border-radius: 10px; border: 1px solid #bfdbfe; letter-spacing: 2px; }
+        
         .hidden { display: none !important; }
+        @media (max-width: 550px) { .placar-container { flex-direction: column; gap: 15px; } .controle-grid { grid-template-columns: 1fr; } .form-row { grid-template-columns: 1fr; } }
     </style>
 </head>
 <body>
 
-    <header>
-        <h1>🏆 InfoSport</h1>
-        <p>Solução Web para Transparência em Eventos Esportivos</p>
-    </header>
-
-    <main class="card">
-        <h2>Selecione seu Perfil</h2>
+    <div class="container">
         
-        <div class="btn-group">
-            <button id="btnArbitro" class="btn btn-role" onclick="selecionarPerfil('arbitro')">🎛️ Árbitro</button>
-            <button id="btnAluno" class="btn btn-role" onclick="selecionarPerfil('aluno')">📱 Aluno</button>
-        </div>
-
-        <div id="formArbitro" class="hidden">
+        <main id="telaSetup" class="card hidden">
+            <h2>⚙️ Nova Partida</h2>
             <div class="form-group">
-                <label for="senhaArbitro">Senha de Acesso</label>
-                <input type="password" id="senhaArbitro" placeholder="Digite a senha do painel">
-                <div id="erroSenha" class="error-msg">❌ Senha incorreta! Tente novamente.</div>
+                <label for="inputModalidade">Modalidade Esportiva</label>
+                <input type="text" id="inputModalidade" placeholder="Ex: Futsal Masculino">
             </div>
-            <button class="btn btn-primary" onclick="entrarComoArbitro()">Entrar no Painel</button>
-        </div>
+            <div class="form-row">
+                <div class="form-group">
+                    <label for="inputTimeA">Time de Casa</label>
+                    <input type="text" id="inputTimeA" placeholder="Ex: Informática">
+                </div>
+                <div class="form-group">
+                    <label for="inputTimeB">Time Visitante</label>
+                    <input type="text" id="inputTimeB" placeholder="Ex: Mecânica">
+                </div>
+            </div>
+            <button class="btn btn-primary" onclick="inicializarPartida()">🚀 Lançar Painel Oficial</button>
+        </main>
 
-        <div id="formAluno" class="hidden">
-            <div class="form-group">
-                <label for="codigoSala">Código da Partida</label>
-                <input type="text" id="codigoSala" placeholder="Ex: jogo_12345">
-                <div id="erroSala" class="error-msg">❌ Digite um código de partida válido.</div>
-            </div>
-            <button class="btn btn-primary" onclick="entrarComoAluno()">Visualizar Placar</button>
+        <div id="telaPlacar" class="container hidden">
+            <main class="card">
+                <h2 id="tituloPlacar">📺 Transmissão ao Vivo</h2>
+                <div class="center-wrapper">
+                    <div id="modalidadeDisplay" class="modalidade-tag">Competição</div>
+                </div>
+                <div class="placar-container">
+                    <div class="time-box">
+                        <h3 id="nomeTimeADisplay">---</h3>
+                        <div id="displayA" class="pontos-display">0</div>
+                    </div>
+                    <div class="vs">VS</div>
+                    <div class="time-box">
+                        <h3 id="nomeTimeBDisplay">---</h3>
+                        <div id="displayB" class="pontos-display">0</div>
+                    </div>
+                </div>
+            </main>
+
+            <section id="painelControle" class="card hidden">
+                <h2>🎛️ Mesa de Controle do Árbitro</h2>
+                <div class="controle-grid">
+                    <div class="col-controle">
+                        <h4 id="labelCtrlA">Time A</h4>
+                        <button class="btn btn-add" onclick="enviarPontos('A', 1)">+ 1 Ponto</button>
+                        <button class="btn btn-sub" onclick="enviarPontos('A', -1)">- 1 Ponto</button>
+                    </div>
+                    <div class="col-controle">
+                        <h4 id="labelCtrlB">Time B</h4>
+                        <button class="btn btn-add" onclick="enviarPontos('B', 1)">+ 1 Ponto</button>
+                        <button class="btn btn-sub" onclick="enviarPontos('B', -1)">- 1 Ponto</button>
+                    </div>
+                </div>
+                <button class="btn btn-reset" onclick="finalizarPartida()">🔄 Fechar e Encerrar Conexão</button>
+            </section>
+
+            <section id="areaCompartilhar" class="card hidden">
+                <h2>📱 Link da Torcida (Alunos)</h2>
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 12px; text-align: center;">
+                    Os alunos podem entrar com o código ou escaneando o QR Code:
+                </p>
+                <div class="qrcode-box">
+                    <div id="salaCodigoDisplay" class="codigo-sala-destaque">------</div>
+                    <div id="qrcodeImgContainer"></div>
+                </div>
+            </section>
         </div>
-    </main>
+    </div>
 
     <script>
-        let perfilSelecionado = '';
+        let pontosTimeA = 0;
+        let pontosTimeB = 0;
+        let canalAbly;
+        let salaId = "";
 
-        function selecionarPerfil(perfil) {
-            perfilSelecionado = perfil;
-            document.getElementById('erroSenha').style.display = 'none';
-            document.getElementById('erroSala').style.display = 'none';
+        const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho";
+        const ably = new Ably.Realtime(ABLY_KEY);
 
-            if (perfil === 'arbitro') {
-                document.getElementById('btnArbitro').classList.add('active');
-                document.getElementById('btnAluno').classList.remove('active');
-                document.getElementById('formArbitro').classList.remove('hidden');
-                document.getElementById('formAluno').classList.add('hidden');
-            } else {
-                document.getElementById('btnAluno').classList.add('active');
-                document.getElementById('btnArbitro').classList.remove('active');
-                document.getElementById('formAluno').classList.remove('hidden');
-                document.getElementById('formArbitro').classList.add('hidden');
-            }
+        const urlParams = new URLSearchParams(window.location.search);
+        const modo = urlParams.get('modo');
+        const salaParam = urlParams.get('sala');
+
+        if (modo === 'arbitro' && !salaParam) {
+            document.getElementById('telaSetup').classList.remove('hidden');
+        } else if (salaParam) {
+            salaId = salaParam;
+            conectarAoCanal();
         }
 
-        function entrarComoArbitro() {
-            const senha = document.getElementById('senhaArbitro').value;
-            if (senha === '043') {
-                window.location.href = 'jogo.html?modo=arbitro';
-            } else {
-                document.getElementById('erroSenha').style.display = 'block';
-            }
+        function inicializarPartida() {
+            salaId = "jogo_" + Math.floor(10000 + Math.random() * 90000);
+            conectarAoCanal();
+
+            const mod = document.getElementById('inputModalidade').value.trim() || "Competição";
+            const timeA = document.getElementById('inputTimeA').value.trim() || "Time A";
+            const timeB = document.getElementById('inputTimeB').value.trim() || "Time B";
+
+            document.getElementById('modalidadeDisplay').textContent = mod;
+            document.getElementById('nomeTimeADisplay').textContent = timeA;
+            document.getElementById('nomeTimeBDisplay').textContent = timeB;
+
+            if(document.getElementById('labelCtrlA')) document.getElementById('labelCtrlA').textContent = timeA;
+            if(document.getElementById('labelCtrlB')) document.getElementById('labelCtrlB').textContent = timeB;
+
+            setTimeout(() => {
+                canalAbly.publish('atualizacao', { modalidade: mod, timeA: timeA, timeB: timeB, pA: 0, pB: 0 });
+            }, 600);
         }
 
-        function entrarComoAluno() {
-            const sala = document.getElementById('codigoSala').value.trim();
-            if (sala !== '') {
-                window.location.href = `jogo.html?sala=${sala}&modo=publico`;
+        function conectarAoCanal() {
+            canalAbly = ably.channels.get(salaId);
+            
+            document.getElementById('telaSetup').classList.add('hidden');
+            document.getElementById('telaPlacar').classList.remove('hidden');
+
+            if (modo === 'arbitro') {
+                document.getElementById('painelControle').classList.remove('hidden');
+                document.getElementById('areaCompartilhar').classList.remove('hidden');
+                document.getElementById('salaCodigoDisplay').textContent = salaId;
+                document.getElementById('tituloPlacar').textContent = "🎛️ Monitor de Controle";
+
+                const baseCaminho = window.location.origin + window.location.pathname;
+                const linkAlunos = `${baseCaminho}?sala=${salaId}&modo=publico`;
+                
+                document.getElementById('qrcodeImgContainer').innerHTML = "";
+                new QRCode(document.getElementById('qrcodeImgContainer'), {
+                    text: linkAlunos,
+                    width: 150,
+                    height: 150
+                });
             } else {
-                document.getElementById('erroSala').style.display = 'block';
+                document.getElementById('tituloPlacar').textContent = "📢 Placar da Torcida";
+            }
+
+            canalAbly.subscribe('atualizacao', (msg) => {
+                const dados = msg.data;
+                document.getElementById('modalidadeDisplay').textContent = dados.modalidade;
+                document.getElementById('nomeTimeADisplay').textContent = dados.timeA;
+                document.getElementById('nomeTimeBDisplay').textContent = dados.timeB;
+                document.getElementById('displayA').textContent = dados.pA;
+                document.getElementById('displayB').textContent = dados.pB;
+                pontosTimeA = dados.pA;
+                pontosTimeB = dados.pB;
+                
+                if(document.getElementById('labelCtrlA')) document.getElementById('labelCtrlA').textContent = dados.timeA;
+                if(document.getElementById('labelCtrlB')) document.getElementById('labelCtrlB').textContent = dados.timeB;
+            });
+
+            canalAbly.subscribe('encerrar', () => {
+                alert("A partida foi finalizada.");
+                window.location.href = 'index.html';
+            });
+        }
+
+        function enviarPontos(time, valor) {
+            const mod = document.getElementById('modalidadeDisplay').textContent;
+            const tA = document.getElementById('nomeTimeADisplay').textContent;
+            const tB = document.getElementById('nomeTimeBDisplay').textContent;
+
+            if (time === 'A') pontosTimeA = Math.max(0, pontosTimeA + valor);
+            if (time === 'B') pontosTimeB = Math.max(0, pontosTimeB + valor);
+
+            canalAbly.publish('atualizacao', {
+                modalidade: mod, timeA: tA, timeB: tB, pA: pontosTimeA, pB: pontosTimeB
+            });
+        }
+
+        function finalizarPartida() {
+            if (confirm("Encerrar o placar ao vivo para todos os usuários conectados?")) {
+                canalAbly.publish('encerrar', {});
+                setTimeout(() => { window.location.href = 'index.html'; }, 500);
             }
         }
     </script>
