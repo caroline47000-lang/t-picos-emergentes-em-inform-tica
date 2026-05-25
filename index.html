@@ -1,265 +1,517 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Agenda Coraline - Premium</title>
-    <link href="https://fonts.googleapis.com/css2?family=Creepster&family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
+    <title>MusicBot - Seu DJ Virtual</title>
     <style>
-        :root {
-            --bg-dark: #05070a;
-            --card-bg: rgba(21, 26, 45, 0.9);
-            --primary-yellow: #facc15;
-            --button-purple: #4c2d75;
-            --text-gray: #94a3b8;
-            --font-display: 'Creepster', cursive;
-            --error-red: #ff4444;
+       
+        @keyframes moverGradiente {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
         }
 
+        
         body {
-            background-color: var(--bg-dark);
-            background-image: radial-gradient(circle at 50% 50%, #1a2236 0%, #05070a 100%), url('https://www.transparenttextures.com/patterns/stardust.png');
-            color: white;
-            font-family: 'Nunito', sans-serif;
-            margin: 0;
+            background: linear-gradient(-45deg, #0b2413, #121212, #1db954, #05140b);
+            background-size: 400% 400%;
+            animation: moverGradiente 15s ease infinite;
+            color: #ffffff;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
             display: flex;
             justify-content: center;
-            min-height: 100vh;
-            padding: 20px;
-        }
-
-        .main-container { width: 100%; max-width: 550px; }
-
-        header h1 {
-            font-family: var(--font-display);
-            color: var(--primary-yellow);
-            font-size: 3.5rem;
-            text-align: center;
+            align-items: center;
+            height: 100vh;
             margin: 0;
-            text-shadow: 0 0 20px rgba(250, 204, 21, 0.4);
+            overflow: hidden;
         }
 
-        .subtitle { text-align: center; color: var(--text-gray); font-size: 0.9rem; letter-spacing: 2px; margin-bottom: 30px; }
-
-        .card-cadastro {
-            background: var(--card-bg);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 20px;
-            padding: 30px;
-            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
-            margin-bottom: 20px;
-        }
-
-        .card-title {
-            color: var(--primary-yellow);
-            font-weight: 700;
+       
+        .chat-container {
+            width: 400px;
+            height: 600px;
+            background-color: rgba(28, 28, 28, 0.95);
+            border-radius: 15px;
+            box-shadow: 0 12px 36px rgba(0,0,0,0.7);
             display: flex;
-            align-items: center; gap: 12px;
-            margin-bottom: 25px;
-            text-transform: uppercase; font-size: 0.9rem;
+            flex-direction: column;
+            overflow: hidden;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
         }
 
-        .sew-button {
-            width: 18px; height: 18px;
-            background: var(--primary-yellow);
+        /* CABEÇALHO COM AVATAR */
+        .chat-header {
+            background-color: #000000;
+            padding: 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #292929;
+            z-index: 10;
+        }
+
+        .avatar {
+            width: 40px;
+            height: 40px;
+            background-color: #1DB954;
             border-radius: 50%;
-            display: inline-grid; grid-template-columns: 1fr 1fr;
-            padding: 3px; gap: 2px; box-shadow: inset 0 0 4px black;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 20px;
+            margin-right: 12px;
         }
-        .hole { background: black; border-radius: 50%; width: 4px; height: 4px; }
 
-        .input-group { margin-bottom: 18px; position: relative; }
-        label { display: block; font-size: 0.8rem; margin-bottom: 6px; color: var(--primary-yellow); opacity: 0.8; }
+        .bot-info h3 {
+            margin: 0;
+            font-size: 16px;
+            color: #fff;
+        }
+
+        .bot-info p {
+            margin: 0;
+            font-size: 12px;
+            color: #1DB954;
+        }
+
         
-        input {
-            width: 100%; padding: 14px; border-radius: 12px;
-            border: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.3); color: white;
-            box-sizing: border-box; transition: 0.3s;
-        }
-        input:focus { border-color: var(--primary-yellow); outline: none; }
-
-        .char-limit { display: block; font-size: 0.7rem; color: var(--text-gray); margin-top: 5px; text-align: right; opacity: 0.6; }
-
-        #tel-error { color: var(--error-red); font-size: 0.75rem; display: none; margin-top: 8px; font-weight: bold; }
-
-        .btn-main {
-            width: 100%; border: none; padding: 15px; border-radius: 12px;
-            font-weight: 800; cursor: pointer; transition: 0.3s; text-transform: uppercase; margin-top: 10px;
+        .chat-messages {
+            flex: 1;
+            padding: 15px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            scroll-behavior: smooth;
         }
 
-        #btn-action { background: var(--primary-yellow); color: black; }
-        #btn-toggle-list { background: transparent; color: var(--primary-yellow); border: 1px solid var(--primary-yellow); font-size: 0.75rem; opacity: 0.7; }
-
-        #secao-contatos { display: none; margin-top: 20px; }
-
-        .contact-item {
-            background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.05);
-            padding: 20px; border-radius: 15px; margin-bottom: 15px;
-            display: flex; justify-content: space-between; align-items: center;
+        
+        .chat-messages::-webkit-scrollbar {
+            width: 6px;
         }
 
-        .contact-info strong { color: var(--primary-yellow); font-size: 1.1rem; }
-        .contact-info p { margin: 5px 0 0 0; color: var(--text-gray); font-size: 0.85rem; }
+        .chat-messages::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+        }
 
-        .actions { display: flex; gap: 10px; }
-        .btn-edit { background: var(--button-purple); color: white; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
-        .btn-del { background: #450a0a; color: #ff4444; border: none; padding: 8px 12px; border-radius: 8px; cursor: pointer; }
+        .chat-messages::-webkit-scrollbar-thumb {
+            background: #404040;
+            border-radius: 10px;
+        }
+
+        .chat-messages::-webkit-scrollbar-thumb:hover {
+            background: #1DB954;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 10px 14px;
+            border-radius: 15px;
+            font-size: 14px;
+            line-height: 1.4;
+            word-wrap: break-word;
+            animation: fadeIn 0.3s ease-in-out;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .message.bot {
+            background-color: #2a2a2a;
+            color: #ffffff;
+            align-self: flex-start;
+            border-bottom-left-radius: 2px;
+        }
+
+        .message.user {
+            background-color: #1DB954;
+            color: #000000;
+            font-weight: 500;
+            align-self: flex-end;
+            border-bottom-right-radius: 2px;
+        }
+
+       
+        .typing-dots {
+            display: flex;
+            gap: 4px;
+            padding: 4px 0;
+            align-items: center;
+        }
+
+        .typing-dots span {
+            width: 6px;
+            height: 6px;
+            background-color: #aaa;
+            border-radius: 50%;
+            animation: balancar 1.4s infinite both;
+        }
+
+        .typing-dots span:nth-child(2) { animation-delay: 0.2s; }
+        .typing-dots span:nth-child(3) { animation-delay: 0.4s; }
+
+        @keyframes balancar {
+            0%, 80%, 100% { transform: scale(0); }
+            40% { transform: scale(1); }
+        }
+
+       
+        .chat-input-area {
+            padding: 15px;
+            background-color: #121212;
+            border-top: 1px solid #292929;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            z-index: 10;
+        }
+
+        .options-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+
+        .option-btn {
+            background-color: #2a2a2a;
+            color: #fff;
+            border: 1px solid #404040;
+            padding: 8px 12px;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.2s ease-in-out;
+        }
+
+        .option-btn:hover {
+            background-color: #1DB954;
+            color: #000;
+            border-color: #1DB954;
+            transform: scale(1.05);
+        }
+
+        .text-input-container {
+            display: flex;
+            gap: 8px;
+        }
+
+        input[type="text"] {
+            flex: 1;
+            background-color: #2a2a2a;
+            border: 1px solid #404040;
+            padding: 10px 15px;
+            border-radius: 20px;
+            color: #fff;
+            outline: none;
+        }
+
+        input[type="text"]:disabled {
+            background-color: #1c1c1c;
+            color: #777;
+            border-color: #292929;
+            cursor: not-allowed;
+        }
+
+        .send-btn {
+            background-color: #1DB954;
+            border: none;
+            color: #000;
+            padding: 10px 18px;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+
+        .send-btn:disabled {
+            background-color: #1c1c1c;
+            color: #777;
+            cursor: not-allowed;
+        }
     </style>
 </head>
 <body>
 
-    <div class="main-container">
-        <header>
-            <h1>Agenda Coraline</h1>
-            <p class="subtitle">TURMA 30 — 2026</p>
-        </header>
+    <div class="chat-container">
+        <div class="chat-header">
+            <div class="avatar">🎧</div>
+            <div class="bot-info">
+                <h3>MusicBot</h3>
+                <p>● Online (Seu DJ Virtual)</p>
+            </div>
+        </div>
 
-        <section class="card-cadastro">
-            <div class="card-title">
-                <div class="sew-button"><div class="hole"></div><div class="hole/div><div class="hole"></div><div class="hole"></div></div>
-                CADASTRAR VISITANTE
-            </div>
-            
-            <input type="hidden" id="edit-index" value="-1">
-            
-            <div class="input-group">
-                <label>NOME COMPLETO</label>
-                <input type="text" id="nome" placeholder="Nome e Sobrenome" maxlength="60">
-                <small class="char-limit">Máximo de 60 caracteres</small>
-            </div>
-            
-            <div class="input-group">
-                <label>ENDEREÇO</label>
-                <input type="text" id="endereco" placeholder="Rua, Número, Bairro" maxlength="60">
-                <small class="char-limit">Máximo de 60 caracteres</small>
-            </div>
-            
-            <div class="input-group">
-                <label>TELEFONE</label>
-                <input type="text" id="telefone" placeholder="(00) 0000-0000" maxlength="14">
-                <small id="tel-error">⚠️ Erro: Use 10 números.</small>
-            </div>
-            
-            <button id="btn-action" class="btn-main">Costurar Contato</button>
-            <button id="btn-toggle-list" class="btn-main">Ver Cadastros Anteriores</button>
-        </section>
+        <div class="chat-messages" id="chatMessages"></div>
 
-        <section id="secao-contatos">
-            <div id="lista-contatos"></div>
-        </section>
+        <div class="chat-input-area">
+            <div class="options-container" id="optionsContainer"></div>
+            <div class="text-input-container">
+                <input type="text" id="userInput" placeholder="Escolha uma opção acima ou digite..." disabled />
+                <button class="send-btn" id="sendBtn" onclick="handleSendText()" disabled>Enviar</button>
+            </div>
+        </div>
     </div>
 
     <script>
-        const btnAction = document.getElementById('btn-action');
-        const btnToggle = document.getElementById('btn-toggle-list');
-        const secaoContatos = document.getElementById('secao-contatos');
-        const lista = document.getElementById('lista-contatos');
-        const inputTelefone = document.getElementById('telefone');
-        const telError = document.getElementById('tel-error');
-        const editIndexInput = document.getElementById('edit-index');
+        
+        const bancoMusicas = {
+            "Rock_Animado": [
+                { frase: "🎰 O algoritmo sintonizou uma descarga de energia pura!", musica: "Don't Stop Me Now", artista: "Queen 🎸" },
+                { frase: "✨ Batidas processadas! Prepare-se para bater cabeça!", musica: "Back In Black", artista: "AC/DC ⚡" }
+            ],
+            "Rock_Feliz": [
+                { frase: "🎸 Uma vibe clássica pra animar o seu dia!", musica: "You Shook Me All Night Long", artista: "AC/DC ⚡" }
+            ],
+            "Rock_Triste": [
+                { frase: "😢 Sintonizando um clássico mais melancólico para refletir...", musica: "Snuff", artista: "Slipknot 🖤" }
+            ],
+            "Rock_Nostálgico": [
+                { frase: "📻 Viajando direto no túnel do tempo do rock n' roll!", musica: "Sweet Child O' Mine", artista: "Guns N' Roses 🌹" }
+            ],
+            "Pop_Feliz": [
+                { frase: "🎰 Seus níveis de dopamina vão explodir com essa!", musica: "Happy", artista: "Pharrell Williams 🎤" },
+                { frase: "✨ Sintonizando uma vibe solar e ultra positiva!", musica: "Sugar", artista: "Maroon 5 🍭" }
+            ],
+            "Pop_Animado": [
+                { frase: "🔥 Batidas perfeitas para aumentar o som no talo!", musica: "Uptown Funk", artista: "Bruno Mars 🕺" }
+            ],
+            "Pop_Triste": [
+                { frase: "😢 Uma melodia profunda para acompanhar os sentimentos...", musica: "Someone Like You", artista: "Adele 💔" }
+            ],
+            "Pop_Nostálgico": [
+                { frase: "📻 Lembra dessa? Um verdadeiro hino pop das antigas!", musica: "Baby One More Time", artista: "Britney Spears 👑" }
+            ],
+            "Sertanejo_Triste": [
+                { frase: "🎰 Prepare o lenço, o sistema detectou uma sofrência pesada!", musica: "Notificação Preferida", artista: "Zé Neto e Cristiano 🤠" },
+                { frase: "✨ Processando corações partidos... Lá vem pancada!", musica: "De Quem É A Culpa?", artista: "Marília Mendonça 👑" }
+            ],
+            "Sertanejo_Animado": [
+                { frase: "🔥 Sistema configurado para o modo festa no interior!", musica: "Erro Gostoso", artista: "Simone Mendes ✨" }
+            ],
+            "Sertanejo_Feliz": [
+                { frase: "🤠 Som pra curtir com a galera bem alto!", musica: "A Gente Fez Amor", artista: "Gusttavo Lima 🏛️" }
+            ],
+            "Sertanejo_Nostálgico": [
+                { frase: "📻 Aquele modão raiz que mexe com o peito!", musica: "Evidências", artista: "Chitãozinho & Xororó 🎤" }
+            ],
+            "Eletrônica_Animado": [
+                { frase: "⚡ Alerta de drop insano! Sinta o grave bater!", musica: "Hear Me Now", artista: "Alok 🎧" }
+            ],
+            "Eletrônica_Feliz": [
+                { frase: "🥳 Energia lá em cima com as batidas eletrônicas mais limpas!", musica: "Wake Me Up", artista: "Avicii ◢ ◤" }
+            ],
+            "Rap/Trap_Animado": [
+                { frase: "🪙 Ritmo e poesia pesados direto na sua caixa de som!", musica: "MODO SUL", artista: "Matuê 🚀" }
+            ],
+            "Padrao": [
+                { frase: "🎧 Direto das caixas de som para o seu perfil!", musica: "Blinding Lights", artista: "The Weeknd 🚀" },
+                { frase: "🔊 Uma recomendação especial aclimatada para os seus ouvidos!", musica: "Bohemian Rhapsody", artista: "Queen 👑" }
+            ]
+        };
 
-        let contatos = JSON.parse(localStorage.getItem('coraline_v3')) ?? [];
+        let dadosUsuario = { nome: "", genero: "", humor: "", epoca: "", idioma: "" };
+        let etapaAtual = 0;
+        
+        const chatMessages = document.getElementById("chatMessages");
+        const optionsContainer = document.getElementById("optionsContainer");
+        const userInput = document.getElementById("userInput");
+        const sendBtn = document.getElementById("sendBtn");
+        let indicadorDigitando = null;
 
-        inputTelefone.addEventListener('input', (e) => {
-            let value = e.target.value.replace(/\D/g, "");
-            if (value.length > 10) value = value.slice(0, 10);
-            telError.style.display = "none";
+        function rolarParaBaixo() {
+            setTimeout(() => {
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }, 50);
+        }
 
-            let formatted = "";
-            if (value.length > 0) {
-                formatted = "(" + value.slice(0, 2);
-                if (value.length > 2) {
-                    formatted += ") " + value.slice(2, 6);
-                    if (value.length > 6) {
-                        formatted += "-" + value.slice(6, 10);
-                    }
+        function adicionarMensagem(texto, remetente) {
+            const msgDiv = document.createElement("div");
+            msgDiv.classList.add("message", remetente);
+            msgDiv.innerHTML = texto;
+            chatMessages.appendChild(msgDiv);
+            rolarParaBaixo();
+        }
+
+        function mostrarDigitando() {
+            removerDigitando();
+            indicadorDigitando = document.createElement("div");
+            indicadorDigitando.classList.add("message", "bot");
+            indicadorDigitando.innerHTML = `<div class="typing-dots"><span></span><span></span><span></span></div>`;
+            chatMessages.appendChild(indicadorDigitando);
+            rolarParaBaixo();
+        }
+
+        function removerDigitando() {
+            if (indicadorDigitando && indicadorDigitando.parentNode) {
+                indicadorDigitando.parentNode.removeChild(indicadorDigitando);
+            }
+        }
+
+        function botFalar(texto, tempoEspera = 1500, callback = null) {
+            optionsContainer.innerHTML = "";
+            mostrarDigitando();
+            
+            setTimeout(() => {
+                removerDigitando();
+                adicionarMensagem(texto, "bot");
+                if (callback) callback();
+            }, tempoEspera);
+        }
+
+        function avancarFluxo() {
+            optionsContainer.innerHTML = "";
+            userInput.disabled = true;
+            sendBtn.disabled = true;
+
+            switch(etapaAtual) {
+                case 0:
+                    botFalar("🎧 Olá! Bem-vindo ao <b>MusicBot</b> criado pela Carol e Isabel, o seu DJ virtual! Estou aqui para entender a sua vibe e recomendar a música perfeita. Pronto para começar? 🚀", 1500, () => {
+                        mostrarBotoes(["Bora! ⚡", "Agora não ❌"], (escolha) => {
+                            if(escolha.includes("Agora não")) {
+                                botFalar("Sem problemas! Quando quiser uma boa música, use o botão para reiniciar. Até mais! 👋", 1000, () => {
+                                    mostrarBotaoReiniciar();
+                                });
+                            } else {
+                                etapaAtual = 1;
+                                avancarFluxo();
+                            }
+                        });
+                    });
+                    break;
+
+                case 1:
+                    botFalar("Excelente! Primeiro, como posso te chamar? Digite seu nome abaixo: 👇", 1200, () => {
+                        userInput.disabled = false;
+                        sendBtn.disabled = false;
+                        userInput.placeholder = "Digite seu nome aqui...";
+                        userInput.focus();
+                        rolarParaBaixo();
+                    });
+                    break;
+
+                case 2:
+                    botFalar(`Muito prazer, <b>${dadosUsuario.nome}</b>! Qual gênero musical mais combina com os seus fones de ouvido hoje? 🎸`, 1400, () => {
+                        mostrarBotoes(["Pop 🎤", "Rock 🎸", "Sertanejo 🤠", "Eletrônica ⚡", "Rap/Trap 🪙"], (escolha) => {
+                            dadosUsuario.genero = escolha.split(" ")[0];
+                            etapaAtual = 3;
+                            avancarFluxo();
+                        });
+                    });
+                    break;
+
+                case 3:
+                    botFalar("Música é sentimento! Como está o seu humor ou o seu estado de espírito agora? 🎭", 1200, () => {
+                        mostrarBotoes(["Feliz 🥳", "Triste 😢", "Animado 🔥", "Nostálgico 📻"], (escolha) => {
+                            dadosUsuario.humor = escolha.split(" ")[0];
+                            etapaAtual = 4;
+                            avancarFluxo();
+                        });
+                    });
+                    break;
+
+                case 4:
+                    botFalar("Você prefere viajar no tempo ou quer ouvir os lançamentos mais frescos? ⏳", 1200, () => {
+                        mostrarBotoes(["Anos 80/90 🕺", "Anos 2000 💿", "Atual 🔥"], (escolha) => {
+                            dadosUsuario.epoca = escolha;
+                            etapaAtual = 5;
+                            avancarFluxo();
+                        });
+                    });
+                    break;
+
+                case 5:
+                    botFalar("Para fecharmos os filtros: em qual idioma você prefere curtir o som? 🌐", 1200, () => {
+                        mostrarBotoes(["Português 🇧🇷", "Inglês 🇺🇸", "Tanto faz! 🌍"], (escolha) => {
+                            dadosUsuario.idioma = escolha;
+                            etapaAtual = 6;
+                            avancarFluxo();
+                        });
+                    });
+                    break;
+
+                case 6:
+                    let combinacao = `${dadosUsuario.genero}_${dadosUsuario.humor}`;
+                    let listaOpcoes = bancoMusicas[combinacao] || bancoMusicas["Padrao"];
+                    let sorteio = listaOpcoes[Math.floor(Math.random() * listaOpcoes.length)];
+
+                    let respostaFinal = `
+                        😎 <b>Aí sim, ${dadosUsuario.nome}! Perfil musical processado.</b><br><br>
+                        Análise de Vibe:<br>
+                        🎷 Gênero: <i>${dadosUsuario.genero}</i><br>
+                        🎭 Vibe: <i>${dadosUsuario.humor}</i><br>
+                        ⏳ Época: <i>${dadosUsuario.epoca}</i><br>
+                        🌐 Idioma: <i>${dadosUsuario.idioma}</i><br><br>
+                        ───<br>
+                        🔊 <b>${sorteio.frase}</b><br><br>
+                        ⭐ Música: <b>${sorteio.musica}</b> — de <u>${sorteio.artista}</u> ⭐
+                    `;
+                    
+                    botFalar(respostaFinal, 2000, () => {
+                        setTimeout(() => {
+                            botFalar("Obrigado por usar o <b>MusicBot</b>! 🚀 Quer fazer outra combinação e ouvir outro som? Clique abaixo! 👇", 1500, () => {
+                                mostrarBotaoReiniciar();
+                            });
+                        }, 1000);
+                    });
+                    break;
+            }
+        }
+
+        function mostrarBotoes(listaOpcoes, callback) {
+            optionsContainer.innerHTML = "";
+            listaOpcoes.forEach(opcao => {
+                const btn = document.createElement("button");
+                btn.classList.add("option-btn");
+                btn.innerText = opcao;
+                btn.onclick = () => {
+                    adicionarMensagem(opcao, "user");
+                    callback(opcao);
+                };
+                optionsContainer.appendChild(btn);
+            });
+            rolarParaBaixo();
+        }
+
+        function mostrarBotaoReiniciar() {
+            optionsContainer.innerHTML = "";
+            const btnReset = document.createElement("button");
+            btnReset.classList.add("option-btn");
+            btnReset.style.borderColor = "#1DB954";
+            btnReset.innerHTML = "🔄 Nova Recomendação";
+            btnReset.onclick = () => {
+                chatMessages.innerHTML = "";
+                dadosUsuario = { nome: "", genero: "", humor: "", epoca: "", idioma: "" };
+                etapaAtual = 0;
+                avancarFluxo();
+            };
+            optionsContainer.appendChild(btnReset);
+            rolarParaBaixo();
+        }
+
+        function handleSendText() {
+            const texto = userInput.value.trim();
+            if(texto !== "") {
+                adicionarMensagem(texto, "user");
+                userInput.value = "";
+                
+                if(etapaAtual === 1) {
+                    dadosUsuario.nome = texto;
+                    etapaAtual = 2;
+                    avancarFluxo();
                 }
             }
-            e.target.value = formatted;
+        }
+
+        userInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                handleSendText();
+            }
         });
 
-        function renderizar() {
-            lista.innerHTML = contatos.length === 0 ? '<p style="text-align:center; opacity:0.5">Nenhuma memória...</p>' : '';
-            contatos.forEach((c, i) => {
-                const div = document.createElement('div');
-                div.className = 'contact-item';
-                div.innerHTML = `
-                    <div class="contact-info"><strong>${c.nome}</strong><p>${c.endereco} • ${c.telefone}</p></div>
-                    <div class="actions">
-                        <button class="btn-edit" onclick="prepararEdicao(${i})">Editar</button>
-                        <button class="btn-del" onclick="remover(${i})">Excluir</button>
-                    </div>`;
-                lista.appendChild(div);
-            });
-            localStorage.setItem('coraline_v3', JSON.stringify(contatos));
-        }
-
-        btnAction.onclick = () => {
-            const nome = document.getElementById('nome').value.trim();
-            const endereco = document.getElementById('endereco').value.trim();
-            const telRaw = inputTelefone.value.replace(/\D/g, "");
-            const idx = parseInt(editIndexInput.value);
-
-          
-            const regexRepeticao = /(.)\1{4,}/; 
-            const regexLetras = /^[A-Za-zÀ-ÖØ-öø-ÿ ]+$/;
-            const palavrasNome = nome.split(" ").filter(p => p.length > 1);
-
-            if (!nome || !endereco) return alert("Preencha todos os campos!");
-            
-            if (regexRepeticao.test(nome) || regexRepeticao.test(endereco)) {
-                return alert("Não use letras repetidas!");
-            }
-
-            if (!regexLetras.test(nome) || palavrasNome.length < 2) {
-                return alert("Insira seu Nome e Sobrenome (apenas letras).");
-            }
-
-            if (telRaw.length !== 10) {
-                telError.style.display = "block";
-                return;
-            }
-
-            const novoContato = { nome, endereco, telefone: inputTelefone.value };
-            if (idx === -1) contatos.push(novoContato);
-            else {
-                contatos[idx] = novoContato;
-                editIndexInput.value = "-1";
-                btnAction.innerText = "Costurar Contato";
-            }
-
-            limparCampos();
-            renderizar();
-            secaoContatos.style.display = 'block';
-        };
-
-        btnToggle.onclick = () => {
-            secaoContatos.style.display = secaoContatos.style.display === 'block' ? 'none' : 'block';
-            if (secaoContatos.style.display === 'block') renderizar();
-        };
-
-        function prepararEdicao(i) {
-            document.getElementById('nome').value = contatos[i].nome;
-            document.getElementById('endereco').value = contatos[i].endereco;
-            document.getElementById('telefone').value = contatos[i].telefone;
-            editIndexInput.value = i;
-            btnAction.innerText = "Atualizar Contato";
-            window.scrollTo(0, 0);
-        }
-
-        function remover(i) {
-            if (confirm("Apagar esta memória?")) { contatos.splice(i, 1); renderizar(); }
-        }
-
-        function limparCampos() {
-            document.getElementById('nome').value = '';
-            document.getElementById('endereco').value = '';
-            document.getElementById('telefone').value = '';
-        }
-
-        renderizar();
+        window.onload = avancarFluxo;
     </script>
 </body>
 </html>
