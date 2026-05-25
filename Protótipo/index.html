@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>InfoSport - Login</title>
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        header { text-align: center; margin-bottom: 35px; max-width: 650px; }
+        header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); width: 100%; max-width: 450px; text-align: center; }
+        h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .btn-role { background-color: #f8fafc; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-role.active { border-color: var(--primary); background-color: #eff6ff; color: var(--primary); }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; outline: none; }
+        .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 5px; display: none; font-weight: 600; }
+        .hidden { display: none !important; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🏆 InfoSport</h1>
+        <p>Solução Web para Transparência em Eventos Esportivos</p>
+    </header>
+
+    <main class="card">
+        <h2>Selecione seu Perfil</h2>
+        
+        <div class="btn-group">
+            <button id="btnArbitro" class="btn btn-role" onclick="selecionarPerfil('arbitro')">🎛️ Árbitro</button>
+            <button id="btnAluno" class="btn btn-role" onclick="selecionarPerfil('aluno')">📱 Aluno</button>
+        </div>
+
+        <div id="formArbitro" class="hidden">
+            <div class="form-group">
+                <label for="senhaArbitro">Senha de Acesso</label>
+                <input type="password" id="senhaArbitro" placeholder="Digite a senha do painel">
+                <div id="erroSenha" class="error-msg">❌ Senha incorreta! Tente novamente.</div>
+            </div>
+            <button class="btn btn-primary" onclick="entrarComoArbitro()">Entrar no Painel</button>
+        </div>
+
+        <div id="formAluno" class="hidden">
+            <div class="form-group">
+                <label for="codigoSala">Código da Partida</label>
+                <input type="text" id="codigoSala" placeholder="Ex: jogo_12345">
+                <div id="erroSala" class="error-msg">❌ Digite um código de partida válido.</div>
+            </div>
+            <button class="btn btn-primary" onclick="entrarComoAluno()">Visualizar Placar</button>
+        </div>
+    </main>
+
+    <script>
+        let perfilSelecionado = '';
+
+        function selecionarPerfil(perfil) {
+            perfilSelecionado = perfil;
+            document.getElementById('erroSenha').style.display = 'none';
+            document.getElementById('erroSala').style.display = 'none';
+
+            if (perfil === 'arbitro') {
+                document.getElementById('btnArbitro').classList.add('active');
+                document.getElementById('btnAluno').classList.remove('active');
+                document.getElementById('formArbitro').classList.remove('hidden');
+                document.getElementById('formAluno').classList.add('hidden');
+            } else {
+                document.getElementById('btnAluno').classList.add('active');
+                document.getElementById('btnArbitro').classList.remove('active');
+                document.getElementById('formAluno').classList.remove('hidden');
+                document.getElementById('formArbitro').classList.add('hidden');
+            }
+        }
+
+        function entrarComoArbitro() {
+            const senha = document.getElementById('senhaArbitro').value;
+            if (senha === '043') {
+               
+                window.location.href = 'jogo.html?modo=arbitro';
+            } else {
+                document.getElementById('erroSenha').style.display = 'block';
+            }
+        }
+
+        function entrarComoAluno() {
+            const sala = document.getElementById('codigoSala').value.trim();
+            if (sala !== '') {
+               
+                window.location.href = `jogo.html?sala=${sala}&modo=publico`;
+            } else {
+                document.getElementById('erroSala').style.display = 'block';
+            }
+        }
+    </script>
+</body>
+</html>
