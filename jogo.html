@@ -1,715 +1,112 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz & Quest</title>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+    <title>InfoSport - Login</title>
     <style>
         :root {
-            --bg-gradient: linear-gradient(135deg, #0A192F 0%, #1B365D 40%, #D4AF37 100%);
-            --container-bg: rgba(255, 255, 255, 0.95);
-            --text-main: #0A192F;
-            --border-color: #D4AF37;
-            --btn-bg: #FFFFFF;
-            --navy-dark: #0A192F;
-            --navy-light: #1B365D;
-            --gold: #D4AF37;
-            --success: #10B981;
-            --error: #EF4444;
-            --white: #FFFFFF;
+            --primary: #2563eb;
+            --primary-dark: #1d4ed8;
+            --bg: #f1f5f9;
+            --card-bg: #ffffff;
+            --text-main: #0f172a;
+            --text-muted: #64748b;
+            --border: #e2e8f0;
+            --danger: #ef4444;
         }
-
-        [data-theme="dark"] {
-            --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #311042 100%);
-            --container-bg: rgba(30, 41, 59, 0.95);
-            --text-main: #f8fafc;
-            --border-color: #818cf8;
-            --btn-bg: #334155;
-            --navy-dark: #f8fafc;
-            --navy-light: #6366f1;
-            --gold: #a78bfa;
-        }
-
-        [data-theme="pastel"] {
-            --bg-gradient: linear-gradient(135deg, #ffdee9 0%, #b5fffc 100%);
-            --container-bg: rgba(255, 255, 255, 0.95);
-            --text-main: #4a5568;
-            --border-color: #ffb6c1;
-            --btn-bg: #fff5f5;
-            --navy-dark: #4a5568;
-            --navy-light: #ffb6c1;
-            --gold: #ffdae0;
-        }
-
-        * { box-sizing: border-box; margin: 0; padding: 0; }
-
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: var(--bg-gradient);
-            background-attachment: fixed;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            transition: background 0.5s ease;
-            overflow-x: hidden;
-        }
-
-        #game-container {
-            background: var(--container-bg); 
-            width: 95%;
-            max-width: 550px;
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0 25px 50px rgba(0,0,0,0.3);
-            border: 3px solid var(--border-color);
-            color: var(--text-main);
-            position: relative;
-            transition: all 0.3s ease;
-        }
-
-        .shake {
-            animation: shakeEffect 0.4s ease-in-out;
-        }
-        @keyframes shakeEffect {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-10px); }
-            40%, 80% { transform: translateX(10px); }
-        }
-
-        .theme-selector {
-            position: absolute;
-            top: 12px;
-            right: 15px;
-            display: flex;
-            gap: 8px;
-            z-index: 5;
-        }
-        .theme-dot {
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            cursor: pointer;
-            border: 2px solid white;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
-        }
-
-        .status-bar { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
-        .lives { font-size: 22px; color: #ff9f43; filter: drop-shadow(1px 1px 0px #000); }
-        .gold-count { font-family: 'Press Start 2P', monospace; font-size: 0.7rem; color: #eab308; }
-
-        .timer-container {
-            width: 100%;
-            height: 12px;
-            background: #cbd5e0;
-            border-radius: 10px;
-            margin: 15px 0;
-            overflow: hidden;
-            border: 1px solid rgba(0,0,0,0.1);
-        }
-
-        #timer-fill {
-            width: 100%;
-            height: 100%;
-            background: #ef4444;
-            transition: width 0.1s linear;
-        }
-
-        .brand-header {
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 12px;
-            margin-bottom: 5px;
-        }
-
-        .brand-header span {
-            font-size: 2rem;
-        }
-
-        h1 { color: var(--text-main); text-align: center; text-transform: uppercase; letter-spacing: 2px; }
-        
-        .subtitle { 
-            font-family: 'Press Start 2P', monospace;
-            text-align: center; 
-            color: var(--border-color); 
-            margin-bottom: 25px; 
-            font-size: 0.65rem; 
-            line-height: 1.4;
-        }
-        
-        .game-alert {
-            font-family: 'Press Start 2P', monospace;
-            color: #EF4444;
-            font-size: 0.55rem;
-            line-height: 1.6;
-            margin-top: 15px;
-            text-align: center;
-            background: rgba(239, 68, 68, 0.1);
-            padding: 8px;
-            border-radius: 5px;
-        }
-
-        h2 { color: var(--text-main); margin-bottom: 20px; font-size: 1.3rem; min-height: 60px; }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-        .flex-vertical { display: flex; flex-direction: column; gap: 15px; }
-
-        .btn {
-            padding: 15px;
-            border: 2px solid var(--navy-light);
-            border-radius: 10px;
-            background: var(--btn-bg);
-            color: var(--text-main);
-            font-size: 1rem;
-            font-weight: bold;
-            cursor: pointer;
-            transition: 0.3s;
-        }
-
-        .btn:hover:not(:disabled) { 
-            background: var(--navy-light); 
-            color: var(--white);
-            border-color: var(--border-color);
-        }
-        
-        .btn-primary {
-            background: var(--navy-light);
-            color: var(--white);
-            border-color: var(--border-color);
-        }
-
-        .class-card {
-            border: 2px solid var(--navy-light);
-            border-radius: 12px;
-            padding: 15px;
-            text-align: center;
-            cursor: pointer;
-            background: var(--btn-bg);
-            transition: 0.2s;
-        }
-        .class-card:hover {
-            border-color: var(--border-color);
-            transform: translateY(-3px);
-        }
-        .class-card h3 { font-size: 1.1rem; margin-bottom: 5px; }
-        .class-card p { font-size: 0.8rem; opacity: 0.8; }
-
-        .rpg-shop {
-            margin-top: 15px;
-            border-top: 2px dashed var(--border-color);
-            padding-top: 15px;
-        }
-        .shop-title { font-family: 'Press Start 2P', monospace; font-size: 0.55rem; margin-bottom: 10px; color: var(--border-color); }
-        .shop-buttons { display: flex; gap: 10px; }
-        .btn-shop {
-            flex: 1;
-            padding: 8px;
-            font-size: 0.75rem;
-            background: #fffbeb;
-            border: 2px solid #eab308;
-            color: #854d0e;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-shop:disabled { background: #e2e8f0; border-color: #cbd5e0; color: #94a3b8; cursor: not-allowed; }
-
-        .powerups-container { display: flex; gap: 10px; margin-top: 15px; }
-        .btn-powerup {
-            flex: 1;
-            padding: 10px;
-            font-size: 0.85rem;
-            background: #f0fdf4;
-            border: 2px solid #16a34a;
-            color: #14532d;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-        .btn-powerup:disabled { background: #e2e8f0; border-color: #cbd5e0; color: #94a3b8; cursor: not-allowed; }
-
-        .badge-box { background: #fef3c7; border: 2px dashed #d97706; padding: 12px; border-radius: 10px; text-align: center; margin: 15px 0; color: #92400e; font-weight: bold; }
-        .leaderboard { margin: 20px 0; background: rgba(0,0,0,0.05); padding: 15px; border-radius: 10px; }
-        .leaderboard h3 { margin-bottom: 10px; font-size: 1rem; text-align: center;}
-        .leaderboard-row { display: flex; justify-content: space-between; padding: 5px 0; border-bottom: 1px solid rgba(0,0,0,0.1); }
-        .rules-content { color: var(--text-main); line-height: 1.6; margin-bottom: 25px; }
-        .rules-content ul { margin-left: 20px; margin-top: 10px; }
-        .rules-content li { margin-bottom: 12px; }
-        .correct { background: var(--success) !important; color: white !important; border-color: var(--success) !important; }
-        .wrong { background: var(--error) !important; color: white !important; border-color: var(--error) !important; }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', system-ui, sans-serif; }
+        body { background-color: var(--bg); color: var(--text-main); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
+        header { text-align: center; margin-bottom: 35px; max-width: 650px; }
+        header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        header p { color: var(--text-muted); font-size: 1rem; }
+        .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); width: 100%; max-width: 450px; text-align: center; }
+        h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
+        .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
+        .btn { width: 100%; padding: 14px; border: none; border-radius: 10px; font-weight: 700; font-size: 0.95rem; cursor: pointer; transition: all 0.2s; }
+        .btn-role { background-color: #f8fafc; border: 2px solid var(--border); color: var(--text-main); }
+        .btn-role.active { border-color: var(--primary); background-color: #eff6ff; color: var(--primary); }
+        .btn-primary { background-color: var(--primary); color: white; }
+        .btn-primary:hover { background-color: var(--primary-dark); }
+        .form-group { margin-bottom: 18px; text-align: left; }
+        .form-group label { display: block; font-size: 0.9rem; font-weight: 600; margin-bottom: 8px; }
+        .form-group input { width: 100%; padding: 12px 16px; border: 1px solid var(--border); border-radius: 10px; font-size: 0.95rem; outline: none; }
+        .error-msg { color: var(--danger); font-size: 0.85rem; margin-top: 5px; display: none; font-weight: 600; }
         .hidden { display: none !important; }
-        #res-score { color: #f59e0b; text-shadow: 1px 1px 2px rgba(0,0,0,0.1); }
-
-        .timeout-overlay {
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(239, 68, 68, 0.95);
-            color: white;
-            padding: 15px 30px;
-            border-radius: 10px;
-            font-family: 'Press Start 2P', monospace;
-            font-size: 0.8rem;
-            z-index: 10;
-            pointer-events: none;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.4);
-            text-align: center;
-        }
-
-        /* ESTILOS DA NOVA JANELA MODAL DE RECORDE */
-        .modal-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.75);
-            border-radius: 17px;
-            display: flex; justify-content: center; align-items: center;
-            z-index: 100;
-        }
-        .modal-content {
-            background: var(--container-bg);
-            border: 3px solid var(--border-color);
-            padding: 25px;
-            width: 85%;
-            border-radius: 15px;
-            text-align: center;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.5);
-        }
-        .modal-title {
-            font-family: 'Press Start 2P', monospace;
-            font-size: 0.65rem;
-            color: var(--border-color);
-            margin-bottom: 15px;
-            line-height: 1.5;
-        }
-        .modal-input {
-            width: 100%;
-            padding: 12px;
-            font-size: 1rem;
-            border: 2px solid var(--navy-light);
-            border-radius: 8px;
-            background: var(--btn-bg);
-            color: var(--text-main);
-            text-align: center;
-            margin-bottom: 15px;
-            font-weight: bold;
-        }
-        .modal-input:focus {
-            outline: none;
-            border-color: var(--border-color);
-        }
     </style>
 </head>
 <body>
 
-<div id="game-container">
-    <div id="record-modal" class="modal-overlay hidden">
-        <div class="modal-content">
-            <h3 class="modal-title">⚔️ JORNADA CONCLUÍDA!<br>GRAVA TEU NOME NO MURAL DO REINO:</h3>
-            <input type="text" id="player-name-input" class="modal-input" placeholder="Seu nome ou alcunha" maxlength="15">
-            <button class="btn btn-primary" style="width: 100%; padding: 10px;" onclick="saveRecordFromModal()">Confirmar</button>
-        </div>
-    </div>
+    <header>
+        <h1>🏆 InfoSport</h1>
+        <p>Solução Web para Transparência em Eventos Esportivos</p>
+    </header>
 
-    <div class="theme-selector">
-        <div class="theme-dot" style="background: #1B365D;" onclick="changeTheme('classic')"></div>
-        <div class="theme-dot" style="background: #1e1b4b;" onclick="changeTheme('dark')"></div>
-        <div class="theme-dot" style="background: #ffb6c1;" onclick="changeTheme('pastel')"></div>
-    </div>
-
-    <div id="screen-welcome">
-        <div class="brand-header">
-            <span>🐾</span>
-            <h1>Quiz & Quest</h1>
-        </div>
-        <p class="subtitle">BEM-VINDO À JORNADA</p>
-        <div class="flex-vertical">
-            <button class="btn btn-primary" onclick="showScreen('screen-class')">Iniciar Jornada</button>
-            <button class="btn" onclick="showScreen('screen-rules')">Ver Diretrizes</button>
-        </div>
-    </div>
-
-    <div id="screen-rules" class="hidden">
-        <div class="brand-header">
-            <span>🐾</span>
-            <h1>Regras do Jogo</h1>
-        </div>
-        <p class="subtitle">LEIA COM ATENÇÃO</p>
-        <div class="rules-content">
-            <ul>
-                <li>⏱️ O tempo corre rápido! Responda antes que a barra se esvazie.</li>
-                <li>📚 São 10 perguntas por matéria.</li>
-                <li>💰 Acertos geram <strong>Moedas de Ouro</strong> para comprar itens na loja!</li>
-                <li>🎭 Escolha sua Classe com sabedoria para obter vantagens passivas.</li>
-            </ul>
-            <div class="game-alert">
-                SE O TEMPO ACABAR PERDE UMA PATINHA!
-            </div>
-        </div>
-        <button class="btn btn-primary" style="width: 100%; margin-top: 10px;" onclick="showScreen('screen-welcome')">Voltar</button>
-    </div>
-
-    <div id="screen-class" class="hidden">
-        <div class="brand-header">
-            <span>🐾</span>
-            <h1>Escolha sua Classe</h1>
-        </div>
-        <p class="subtitle">SELECIONE SEU PERFIL</p>
-        <div class="flex-vertical">
-            <div class="class-card" onclick="selectClass('gato')">
-                <h3>🐱 Gato Sortudo</h3>
-                <p>Inicia a aventura com <strong>4 Patinhas</strong> (vidas) em vez de 3.</p>
-            </div>
-            <div class="class-card" onclick="selectClass('mago')">
-                <h3>🧙‍♂️ Mago do Tempo</h3>
-                <p>Manipula o tempo! Sua barra de resposta concede <strong>60 segundos</strong> de prazo.</p>
-            </div>
-            <div class="class-card" onclick="selectClass('raposa')">
-                <h3>🦊 Raposa Astuta</h3>
-                <p>Começa a partida com <strong>2 Pulos</strong> guardados em seu inventário.</p>
-            </div>
-        </div>
-        <button class="btn" style="width: 100%; margin-top: 15px; font-size: 0.85rem;" onclick="showScreen('screen-welcome')">Voltar</button>
-    </div>
-
-    <div id="screen-start" class="hidden">
-        <div class="brand-header">
-            <span>🐾</span>
-            <h1>Selecione o Reino</h1>
-        </div>
-        <p class="subtitle">ESCOLHA A MATÉRIA</p>
-        <div class="grid">
-            <button class="btn" onclick="initGame('História')">História</button>
-            <button class="btn" onclick="initGame('Literatura')">Literatura</button>
-            <button class="btn" onclick="initGame('Química')">Química</button>
-            <button class="btn" onclick="initGame('Geography')">Geografia</button>
-        </div>
-    </div>
-
-    <div id="screen-quiz" class="hidden">
-        <div class="status-bar">
-            <span id="txt-subject" style="font-weight: bold; font-size: 1.1rem;"></span>
-            <div class="gold-count">💰 <span id="txt-gold">0</span>0g</div>
-            <div class="lives" id="txt-lives"></div>
-        </div>
-        <div class="timer-container"><div id="timer-fill"></div></div>
-        <p id="txt-progress" style="opacity: 0.8; font-size: 0.8rem; margin-bottom: 10px;"></p>
-        <h2 id="txt-question"></h2>
-        <div id="options-container" class="grid" style="grid-template-columns: 1fr;"></div>
+    <main class="card">
+        <h2>Selecione seu Perfil</h2>
         
-        <div class="powerups-container">
-            <button id="powerup-skip" class="btn-powerup" onclick="useSkip()">⏭️ Pular (<span id="skip-count">1</span>)</button>
+        <div class="btn-group">
+            <button id="btnArbitro" class="btn btn-role" onclick="selecionarPerfil('arbitro')">🎛️ Árbitro</button>
+            <button id="btnAluno" class="btn btn-role" onclick="selecionarPerfil('aluno')">📱 Aluno</button>
         </div>
 
-        <div class="rpg-shop">
-            <div class="shop-title">🛒 LOJA DE ITENS (INTERATIVA)</div>
-            <div class="shop-buttons">
-                <button id="shop-heal" class="btn-shop" onclick="buyHeal()">🧪 Poção (Cost: 200g)</button>
-                <button id="shop-5050" class="btn-shop" onclick="buy5050()">📜 Pergaminho 50/50 (Cost: 150g)</button>
+        <div id="formArbitro" class="hidden">
+            <div class="form-group">
+                <label for="senhaArbitro">Senha de Acesso</label>
+                <input type="password" id="senhaArbitro" placeholder="Digite a senha do painel">
+                <div id="erroSenha" class="error-msg">❌ Senha incorreta! Tente novamente.</div>
             </div>
+            <button class="btn btn-primary" onclick="entrarComoArbitro()">Entrar no Painel</button>
         </div>
-    </div>
 
-    <div id="screen-result" class="hidden">
-        <h1 id="res-title"></h1>
-        <p id="res-score" style="text-align: center; font-size: 3.5rem; margin: 10px 0; font-weight: bold;"></p>
-        <div id="badge-display" class="badge-box"></div>
-        <div class="leaderboard">
-            <h3>🏆 Recordes da Região</h3>
-            <div id="leaderboard-content"></div>
+        <div id="formAluno" class="hidden">
+            <div class="form-group">
+                <label for="codigoSala">Código da Partida</label>
+                <input type="text" id="codigoSala" placeholder="Ex: jogo_12345">
+                <div id="erroSala" class="error-msg">❌ Digite um código de partida válido.</div>
+            </div>
+            <button class="btn btn-primary" onclick="entrarComoAluno()">Visualizar Placar</button>
         </div>
-        <button class="btn btn-primary" onclick="location.reload()" style="width: 100%;">Jogar Novamente</button>
-    </div>
-</div>
+    </main>
 
-<script>
-    const DATA = {
-        "História": [
-            {p: "Quem foi o principal líder da Inconfidência Mineira?", o: ["D. Pedro I", "Tiradentes", "Zumbi", "Bento Gonçalves"], r: 1},
-            {p: "Em que ano a escravidão foi abolida no Brasil?", o: ["1822", "1888", "1889", "1500"], r: 1},
-            {p: "Qual civilização construiu as Pirâmides de Gizé?", o: ["Maias", "Incas", "Egípcios", "Gregos"], r: 2},
-            {p: "A Queda do Muro de Berlim ocorreu em:", o: ["1985", "1989", "1991", "1994"], r: 1},
-            {p: "Quem descobriu o Brasil em 1500?", o: ["Vasco da Gama", "Pedro Álvares Cabral", "Colombo", "Magalhães"], r: 1},
-            {p: "A Primeira Guerra Mundial começou em:", o: ["1914", "1939", "1918", "1945"], r: 0},
-            {p: "Quem foi o primeiro presidente do Brasil?", o: ["Getúlio Vargas", "Deodoro da Fonseca", "Floriano Peixoto", "D. Pedro II"], r: 1},
-            {p: "A Revolução Francesa iniciou-se em:", o: ["1789", "1799", "1804", "1776"], r: 0},
-            {p: "Zumbi foi líder de qual Quilombo?", o: ["Jabaquara", "Palmares", "Mairiporã", "Canudos"], r: 1},
-            {p: "O período da Pedra Lascada é chamado de:", o: ["Neolítico", "Paleolítico", "Idade do Bronze", "Mesolítico"], r: 1}
-        ],
-        "Literatura": [
-            {p: "Quem escreveu 'Dom Casmurro'?", o: ["José de Alencar", "Machado de Assis", "Clarice Lispector", "Jorge Amado"], r: 1},
-            {p: "A obra que inicia o Realismo no Brasil é:", o: ["Iracema", "O Cortiço", "Memórias Póstumas de Brás Cubas", "Senhora"], r: 2},
-            {p: "Qual autor escreveu 'Capitães da Areia'?", o: ["Graciliano Ramos", "Jorge Amado", "Érico Veríssimo", "Guimarães Rosa"], r: 1},
-            {p: "A 'Semana de Arte Moderna' ocorreu em:", o: ["1920", "1922", "1930", "1945"], r: 1},
-            {p: "Quem escreveu o poema épico 'Os Lusíadas'?", o: ["Fernando Pessoa", "Luís de Camões", "Gil Vicente", "Eça de Queirós"], r: 1},
-            {p: "Álvares de Azevedo faz parte de qual geração?", o: ["1ª Geração", "2ª Geração (Mal do Século)", "3ª Geração", "Modernismo"], r: 1},
-            {p: "Quem escreveu 'Vidas Secas'?", o: ["Machado de Assis", "Graciliano Ramos", "Clarice Lispector", "Lygia Fagundes"], r: 1},
-            {p: "O autor de 'O Guarani' é:", o: ["José de Alencar", "Gonçalves Dias", "Castro Alves", "Manuel Bandeira"], r: 0},
-            {p: "Qual escola literária foca no exagero e contrastes?", o: ["Arcadismo", "Barroco", "Realismo", "Parnasianismo"], r: 1},
-            {p: "Quem escreveu 'A Hora da Estrela'?", o: ["Clarice Lispector", "Cecília Meireles", "Cora Coralina", "Rachel de Queiroz"], r: 0}
-        ],
-        "Química": [
-            {p: "Qual o símbolo químico do Ouro?", o: ["Ag", "Au", "Fe", "Cu"], r: 1},
-            {p: "Qual o pH de uma substância neutra?", o: ["0", "14", "7", "5"], r: 2},
-            {p: "O elemento principal do diamante é o:", o: ["Oxigênio", "Nitrogênio", "Carbono", "Ferro"], r: 2},
-            {p: "Qual a fórmula da água?", o: ["H2O", "CO2", "NaCl", "O2"], r: 0},
-            {p: "Qual gás é essencial para nossa respiração?", o: ["Nitrogênio", "Oxigênio", "Hidrogênio", "Hélio"], r: 1},
-            {p: "A tabela periódica é organizada pelo número:", o: ["Massa", "Número Atômico", "Nome", "Cor"], r: 1},
-            {p: "O estado físico do mercúrio (temp. ambiente) é:", o: ["Sólido", "Líquido", "Gasoso", "Plasma"], r: 1},
-            {p: "Mistura de água e óleo é:", o: ["Homogênea", "Heterogênea", "Pura", "Coloide"], r: 1},
-            {p: "Qual o símbolo do Sódio na tabela?", o: ["S", "So", "Na", "Sd"], r: 2},
-            {p: "O que é um Cátion?", o: ["Íon Negativo", "Íon Positivo", "Nêutron", "Elétron"], r: 1}
-        ],
-        "Geography": [
-            {p: "Qual é o maior país do mundo em extensão territorial?", o: ["Canadá", "China", "Rússia", "Brasil"], r: 2},
-            {p: "Qual destas camadas da Terra é a mais externa?", o: ["Manto", "Núcleo Externo", "Crosta", "Núcleo Interno"], r: 2},
-            {p: "O Monte Everest fica em qual cordilheira?", o: ["Andes", "Himalaia", "Alpes", "Rocosas"], r: 1},
-            {p: "Qual é o rio mais extenso do mundo?", o: ["Rio Nilo", "Rio Amazonas", "Rio Mississipi", "Rio Yangtzé"], r: 1},
-            {p: "A linha imaginária que divide a Terra em Norte e Sul é:", o: ["Meridiano de Greenwich", "Trópico de Câncer", "Linha do Equador", "Círculo Polar Ártico"], r: 2},
-            {p: "Qual país possui a maior população do mundo atualmente?", o: ["Estados Unidos", "Índia", "China", "Indonésia"], r: 1},
-            {p: "O processo de desertificação é mais comum em qual clima?", o: ["Equatorial", "Semiárido", "Polar", "Temperado"], r: 1},
-            {p: "Qual continente é conhecido como o 'berço da humanidade'?", o: ["Ásia", "Europa", "África", "América"], r: 2},
-            {p: "O que caracteriza o movimento de Translação da Terra?", o: ["Giro no próprio eixo", "Giro em torno da Lua", "Giro em torno do Sol", "Giro das marés"], r: 2},
-            {p: "Qual destes é um país transcontinental?", o: ["Turquia", "Japão", "Brasil", "Austrália"], r: 0}
-        ]
-    };
+    <script>
+        let perfilSelecionado = '';
 
-    let baseTimeLimit = 400; 
-    let qIdx = 0, score = 0, lives = 3, maxLives = 3, timer, timeLeft = baseTimeLimit;
-    let currentSub = "", list = [];
-    
-    let chosenClass = "";
-    let gold = 0;
-    let skipCount = 1;
+        function selecionarPerfil(perfil) {
+            perfilSelecionado = perfil;
+            document.getElementById('erroSenha').style.display = 'none';
+            document.getElementById('erroSala').style.display = 'none';
 
-    function changeTheme(theme) {
-        if(theme === 'classic') document.documentElement.removeAttribute('data-theme');
-        else document.documentElement.setAttribute('data-theme', theme);
-    }
-
-    function showScreen(screenId) {
-        const screens = ['screen-welcome', 'screen-rules', 'screen-class', 'screen-start', 'screen-quiz', 'screen-result'];
-        screens.forEach(id => document.getElementById(id).classList.add('hidden'));
-        document.getElementById(screenId).classList.remove('hidden');
-    }
-
-    function selectClass(className) {
-        chosenClass = className;
-        if(className === 'gato') { maxLives = 4; lives = 4; skipCount = 1; baseTimeLimit = 400; } 
-        else if(className === 'mago') { maxLives = 3; lives = 3; skipCount = 1; baseTimeLimit = 600; } 
-        else if(className === 'raposa') { maxLives = 3; lives = 3; skipCount = 2; baseTimeLimit = 400; }
-        showScreen('screen-start');
-    }
-
-    function initGame(sub) {
-        currentSub = sub === 'Geography' ? 'Geografia' : sub; 
-        qIdx = 0; score = 0; gold = 0;
-        document.getElementById('txt-subject').innerText = currentSub;
-        lives = (chosenClass === 'gato') ? 4 : 3;
-        skipCount = (chosenClass === 'raposa') ? 2 : 1;
-
-        list = [...DATA[sub]].sort(() => Math.random() - 0.5);
-        showScreen('screen-quiz');
-        load();
-    }
-
-    function load() {
-        if(qIdx >= 10 || lives <= 0) return end();
-        clearInterval(timer); 
-        timeLeft = baseTimeLimit;
-        
-        document.getElementById('timer-fill').style.width = "100%";
-        document.getElementById('txt-gold').innerText = gold;
-        document.getElementById('txt-lives').innerText = "🐾".repeat(lives);
-        document.getElementById('skip-count').innerText = skipCount;
-        document.getElementById('txt-progress').innerText = `Questão ${qIdx + 1}/10`;
-        document.getElementById('txt-question').innerText = list[qIdx].p;
-        
-        updateShopButtons();
-        document.getElementById('powerup-skip').disabled = (skipCount <= 0);
-
-        const box = document.getElementById('options-container');
-        box.innerHTML = "";
-        list[qIdx].o.forEach((opt, i) => {
-            const b = document.createElement('button');
-            b.className = 'btn'; b.innerText = opt;
-            b.onclick = () => check(i, b);
-            box.appendChild(b);
-        });
-
-        timer = setInterval(() => {
-            timeLeft--;
-            document.getElementById('timer-fill').style.width = (timeLeft / baseTimeLimit * 100) + "%";
-            if(timeLeft <= 0) { 
-                clearInterval(timer);
-                triggerTimeoutMessage();
+            if (perfil === 'arbitro') {
+                document.getElementById('btnArbitro').classList.add('active');
+                document.getElementById('btnAluno').classList.remove('active');
+                document.getElementById('formArbitro').classList.remove('hidden');
+                document.getElementById('formAluno').classList.add('hidden');
+            } else {
+                document.getElementById('btnAluno').classList.add('active');
+                document.getElementById('btnArbitro').classList.remove('active');
+                document.getElementById('formAluno').classList.remove('hidden');
+                document.getElementById('formArbitro').classList.add('hidden');
             }
-        }, 100);
-    }
-
-    function triggerTimeoutMessage() {
-        triggerDamage();
-        lives--; 
-        
-        const btns = document.querySelectorAll('#options-container button');
-        btns.forEach(b => b.disabled = true);
-
-        const msg = document.createElement('div');
-        msg.className = 'timeout-overlay';
-        msg.innerText = "⏰ TEMPO ESGOTADO!";
-        document.getElementById('game-container').appendChild(msg);
-
-        setTimeout(() => {
-            msg.remove();
-            qIdx++; 
-            load(); 
-        }, 1500);
-    }
-
-    function useSkip() {
-        if(skipCount <= 0) return;
-        skipCount--; qIdx++; load();
-    }
-
-    function buyHeal() {
-        if(gold >= 15 && lives < maxLives) {
-            gold -= 15; lives++;
-            document.getElementById('txt-lives').innerText = "🐾".repeat(lives);
-            document.getElementById('txt-gold').innerText = gold;
-            updateShopButtons();
-        }
-    }
-
-    function buy5050() {
-        if(gold >= 15) {
-            gold -= 15;
-            document.getElementById('txt-gold').innerText = gold;
-            updateShopButtons();
-            
-            const correctIdx = list[qIdx].r;
-            const btns = document.querySelectorAll('#options-container button');
-            let removed = 0;
-            btns.forEach((btn, idx) => {
-                if(idx !== correctIdx && removed < 2 && !btn.disabled) {
-                    btn.style.opacity = "0.2"; btn.disabled = true; removed++;
-                }
-            });
-        }
-    }
-
-    function updateShopButtons() {
-        document.getElementById('shop-heal').disabled = (gold < 15 || lives >= maxLives);
-        document.getElementById('shop-5050').disabled = (gold < 15);
-    }
-
-    function triggerDamage() {
-        const container = document.getElementById('game-container');
-        container.classList.add('shake');
-        setTimeout(() => container.classList.remove('shake'), 400);
-    }
-
-    function check(idx, btn) {
-        clearInterval(timer);
-        const correct = list[qIdx].r;
-        const btns = document.querySelectorAll('#options-container button');
-        btns.forEach(b => b.disabled = true);
-
-        if(idx === correct) {
-            btn.classList.add('correct'); score++; gold += 5;
-            document.getElementById('txt-gold').innerText = gold;
-        } else {
-            btn.classList.add('wrong'); btns[correct].classList.add('correct'); lives--; triggerDamage();
-        }
-        setTimeout(() => { qIdx++; load(); }, 1200);
-    }
-
-    function getBadge() {
-        if(score === 10 && lives === maxLives) return "🥇 Herói Lendário (Gabaritou ileso!)";
-        if(lives === 1) return "🪵 Sobrevivente do Calabouço (Ficou por um triz!)";
-        if(score >= 5 && score <= 7) return "📖 Cavaleiro Aprendiz (Rendimento moderado)";
-        if(score >= 8) return "🏆 Paladino do Conhecimento (Excelente pontuação!)";
-        return "🌱 Camponês Novato (Pratique mais aventuras!)";
-    }
-
-    // CONTROLE DO MODAL CUSTOMIZADO
-    function openRecordModal() {
-        document.getElementById('player-name-input').value = "";
-        document.getElementById('record-modal').classList.remove('hidden');
-        document.getElementById('player-name-input').focus();
-    }
-
-    function saveRecordFromModal() {
-        let name = document.getElementById('player-name-input').value.trim() || "Anônimo";
-        document.getElementById('record-modal').classList.add('hidden');
-
-        let records = JSON.parse(localStorage.getItem('rpg_quiz_records')) || [];
-        
-        records.push({ id: Date.now(), name: name, score: score, subject: currentSub, r_class: chosenClass.toUpperCase() });
-        records.sort((a, b) => b.score - a.score);
-        records = records.slice(0, 3);
-        
-        localStorage.setItem('rpg_quiz_records', JSON.stringify(records));
-        renderLeaderboard();
-    }
-
-    function renderLeaderboard() {
-        let records = JSON.parse(localStorage.getItem('rpg_quiz_records')) || [];
-        const container = document.getElementById('leaderboard-content');
-        container.innerHTML = "";
-        
-        if(records.length === 0) {
-            container.innerHTML = `<p style="text-align:center; font-size:0.8rem; opacity:0.6;">Nenhum recorde registrado.</p>`;
-            return;
         }
 
-        records.forEach((rec, index) => {
-            const row = document.createElement('div');
-            row.className = 'leaderboard-row';
-            row.style.display = 'flex';
-            row.style.justifyContent = 'space-between';
-            row.style.alignItems = 'center';
-            row.style.padding = '5px 0';
-            row.style.borderBottom = '1px solid rgba(0,0,0,0.1)';
-
-            row.innerHTML = `
-                <span style="flex-grow: 1; text-align: left;">${index + 1}. ${rec.name} [${rec.r_class}] (${rec.subject})</span>
-                <strong style="margin-right: 10px;">${rec.score}/10</strong>
-            `;
-
-            const delBtn = document.createElement('button');
-            delBtn.innerHTML = '🗑️';
-            delBtn.style.background = 'none';
-            delBtn.style.border = 'none';
-            delBtn.style.cursor = 'pointer';
-            delBtn.style.fontSize = '1rem';
-            delBtn.onclick = () => deleteRecord(rec.id);
-
-            row.appendChild(delBtn);
-            container.appendChild(row);
-        });
-    }
-
-    function deleteRecord(id) {
-        if(confirm("Deseja mesmo apagar este recorde do mural do reino?")) {
-            let records = JSON.parse(localStorage.getItem('rpg_quiz_records')) || [];
-            records = records.filter(rec => rec.id !== id);
-            localStorage.setItem('rpg_quiz_records', JSON.stringify(records));
-            renderLeaderboard();
+        function entrarComoArbitro() {
+            const senha = document.getElementById('senhaArbitro').value;
+            if (senha === '043') {
+                window.location.href = 'jogo.html?modo=arbitro';
+            } else {
+                document.getElementById('erroSenha').style.display = 'block';
+            }
         }
-    }
 
-    function end() {
-        clearInterval(timer);
-        showScreen('screen-result');
-        document.getElementById('res-title').innerText = lives <= 0 ? "Derrotado! 💀" : "Vitória Régia! 🏆";
-        document.getElementById('res-score').innerText = `${score} / 10`;
-        document.getElementById('badge-display').innerText = getBadge();
-        
-        renderLeaderboard();
-        setTimeout(openRecordModal, 400);
-    }
-</script>
+        function entrarComoAluno() {
+            const sala = document.getElementById('codigoSala').value.trim();
+            if (sala !== '') {
+                window.location.href = `jogo.html?sala=${sala}&modo=publico`;
+            } else {
+                document.getElementById('erroSala').style.display = 'block';
+            }
+        }
+    </script>
 </body>
 </html>
