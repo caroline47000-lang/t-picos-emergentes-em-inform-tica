@@ -19,6 +19,7 @@
         body { background-color: var(--bg); color: var(--text-main); padding: 40px 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; }
         header { text-align: center; margin-bottom: 35px; max-width: 650px; }
         header h1 { font-size: 2.5rem; font-weight: 800; background: linear-gradient(to right, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 10px; }
+        header p { color: var(--text-muted); font-size: 1rem; }
         .card { background: var(--card-bg); border-radius: 20px; padding: 30px; box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05); border: 1px solid rgba(0, 0, 0, 0.03); width: 100%; max-width: 450px; text-align: center; }
         h2 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; border-bottom: 1px solid var(--border); padding-bottom: 12px; }
         .btn-group { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 20px; }
@@ -92,7 +93,6 @@
         function entrarComoArbitro() {
             const senha = document.getElementById('senhaArbitro').value;
             if (senha === '043') {
-               
                 window.location.href = 'jogo.html?modo=arbitro';
             } else {
                 document.getElementById('erroSenha').style.display = 'block';
@@ -102,7 +102,6 @@
         function entrarComoAluno() {
             const sala = document.getElementById('codigoSala').value.trim();
             if (sala !== '') {
-               
                 window.location.href = `jogo.html?sala=${sala}&modo=publico`;
             } else {
                 document.getElementById('erroSala').style.display = 'block';
