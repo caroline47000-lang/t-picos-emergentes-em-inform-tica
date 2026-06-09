@@ -138,7 +138,7 @@
         <div id="bannerEncerrado" class="status-encerrado">⚠️ Partida Encerrada pelo Árbitro!</div>
 
         <h3>📊 Monitor de Controle</h3>
-        <div class="badge-mod" id="modalidadeDisplay">Competição</div>
+        <div class="badge-mod" id="modalidadeDisplay">Aguardando Partida...</div>
         
         <div class="placar-box">
             <div class="time-col">
@@ -210,11 +210,12 @@
                     conectarAoCanal();
                     renderizarPaineisArbitro();
                 }
-            } else if (modoUrl === 'publico' && salaId) {
+            } else if (modoUrl === 'publico') {
                 conectarAoCanal();
                 document.getElementById('containerMonitor').classList.remove('hidden');
                 carregarHistoricoLocal();
             } else {
+                // Se não tiver modo definido, manda pra index
                 window.location.href = "index.html";
             }
         };
@@ -247,41 +248,28 @@
             renderizarPaineisArbitro();
 
             setTimeout(() => {
+                // Notifica também no canal global para que os alunos pulem para a nova sala
+                canalHistorico.publish('nova_sala_ativa', { novaSala: salaId });
                 canalAbly.publish('atualizacao', { modalidade: mod, timeA: timeA, timeB: timeB, pA: 0, pB: 0, status: 'ativo' });
             }, 600);
         }
 
         function conectarAoCanal() {
-            if (ably && canalAbly) {
-                canalAbly.unsubscribe();
-            }
-
             ably = new Ably.Realtime({ key: ABLY_KEY });
-            canalAbly = ably.channels.get(salaId);
             canalHistorico = ably.channels.get('infosport_historico_global');
 
-            canalAbly.subscribe('atualizacao', (msg) => {
-                const dados = msg.data;
-                document.getElementById('modalidadeDisplay').textContent = dados.modalidade;
-                document.getElementById('nomeTimeADisplay').textContent = dados.timeA;
-                document.getElementById('nomeTimeBDisplay').textContent = dados.timeB;
-                document.getElementById('pontosADisplay').textContent = dados.pA;
-                document.getElementById('pontosBDisplay').textContent = dados.pB;
-                
-                pontuacao.A = dados.pA;
-                pontuacao.B = dados.pB; 
-
-                if (dados.status === 'encerrado') {
-                    document.getElementById('bannerEncerrado').style.display = 'block';
-                    
-                   
-                    if (modoUrl === 'publico') {
-                        setTimeout(() => {
-                            window.location.href = "index.html";
-                        }, 5000);
-                    }
+            // Ouvinte do canal global (Crucial para o celular do Aluno)
+            canalHistorico.subscribe('nova_sala_ativa', (msg) => {
+                if (modoUrl === 'publico') {
+                    // Aluno muda de sala dinamicamente sem atualizar a página inteira
+                    salaId = msg.data.novaSala;
+                    escutarSalaAtual();
                 }
             });
+
+            if (salaId) {
+                escutarSalaAtual();
+            }
 
             canalHistorico.subscribe('partida_salva', (msg) => {
                 salvarNoHistoricoLocal(msg.data);
@@ -301,13 +289,53 @@
             }, 5000);
         }
 
+        function escutarSalaAtual() {
+            if (canalAbly) {
+                canalAbly.unsubscribe();
+            }
+            
+            canalAbly = ably.channels.get(salaId);
+            document.getElementById('bannerEncerrado').style.display = 'none';
+
+            canalAbly.subscribe('atualizacao', (msg) => {
+                const dados = msg.data;
+                document.getElementById('modalidadeDisplay').textContent = dados.modalidade;
+                document.getElementById('nomeTimeADisplay').textContent = dados.timeA;
+                document.getElementById('nomeTimeBDisplay').textContent = dados.timeB;
+                document.getElementById('pontosADisplay').textContent = dados.pA;
+                document.getElementById('pontosBDisplay').textContent = dados.pB;
+                
+                pontuacao.A = dados.pA;
+                pontuacao.B = dados.pB; 
+
+                if (dados.status === 'encerrado') {
+                    document.getElementById('bannerEncerrado').style.display = 'block';
+                    
+                    // CORREÇÃO: Em vez de ir para index.html, limpa a tela após 6 segundos e espera o próximo jogo
+                    if (modoUrl === 'publico') {
+                        setTimeout(() => {
+                            if (document.getElementById('bannerEncerrado').style.display === 'block') {
+                                document.getElementById('bannerEncerrado').style.display = 'none';
+                                document.getElementById('modalidadeDisplay').textContent = "Aguardando próxima partida...";
+                                document.getElementById('nomeTimeADisplay').textContent = "---";
+                                document.getElementById('nomeTimeBDisplay').textContent = "---";
+                                document.getElementById('pontosADisplay').textContent = "0";
+                                document.getElementById('pontosBDisplay').textContent = "0";
+                            }
+                        }, 6000);
+                    }
+                }
+            });
+        }
+
         function renderizarPaineisArbitro() {
             document.getElementById('containerMonitor').classList.remove('hidden');
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
             let urlCompleta = window.location.href.split('?')[0];
-            const urlTorcida = `${urlCompleta}?sala=${encodeURIComponent(salaId)}&modo=publico`;
+            // Enviamos o aluno apenas com modo=publico, a troca de salas ocorre via WebSocket Ably
+            const urlTorcida = `${urlCompleta}?modo=publico`;
             
             new QRious({
                 element: document.getElementById('qrcode-canvas'),
@@ -359,8 +387,10 @@
                 canalHistorico.publish('partida_salva', dadosFinais);
 
                 setTimeout(() => {
-                    window.location.href = "index.html";
-                }, 1500); 
+                    // O admin volta para limpar a URL e criar outra
+                    let urlLimpa = window.location.href.split('?')[0];
+                    window.location.href = `${urlLimpa}?modo=arbitro`;
+                }, 1000); 
             }
         }
 
