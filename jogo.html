@@ -238,11 +238,24 @@
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
-           
-            let urlBase = window.location.href.split('?')[0];
             
+            let urlLimpa = window.location.href.split('?')[0];
             
-            const urlTorcida = `${urlBase}?sala=${salaId}&modo=publico`;
+            if (!urlLimpa.includes('Protótipo/jogo.html') && !urlLimpa.includes('Prototipe/jogo.html')) {
+                if (urlLimpa.endsWith('/')) {
+                    urlLimpa += 'Protótipo/jogo.html';
+                } else if (urlLimpa.endsWith('Protótipo') || urlLimpa.endsWith('Protótipo/')) {
+                    urlLimpa = urlLimpa.replace(/Protótipo\/?$/, 'Protótipo/jogo.html');
+                } else {
+                   
+                    const baseIdx = urlLimpa.indexOf('/t-picos-emergentes-em-inform-tica');
+                    if (baseIdx !== -1) {
+                        urlLimpa = urlLimpa.substring(0, baseIdx) + '/t-picos-emergentes-em-inform-tica/Protótipo/jogo.html';
+                    }
+                }
+            }
+            
+            const urlTorcida = `${urlLimpa}?sala=${salaId}&modo=publico`;
             
             document.getElementById('qrcode').innerHTML = "";
             new QRCode(document.getElementById("qrcode"), {
