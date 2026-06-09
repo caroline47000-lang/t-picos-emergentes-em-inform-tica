@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InfoSport - Login</title>
+    <title>InfoSport - Login do Árbitro</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -19,27 +19,19 @@
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --input-bg: rgba(15, 23, 42, 0.6);
-            --danger-bg: rgba(239, 68, 68, 0.15);
-            --danger-text: #f87171;
         }
 
-        * { 
-            margin: 0; 
-            padding: 0; 
-            box-sizing: border-box; 
-            font-family: 'Inter', sans-serif; 
-        }
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
         
         body { 
             background: linear-gradient(135deg, var(--bg-start), var(--bg-end), var(--bg-start));
             background-size: 400% 400%;
             animation: gradientBg 15s ease infinite;
-            color: var(--text-main); 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
+            color: var(--text-main);
+            display: flex;
+            align-items: center;
             justify-content: center;
-            min-height: 100vh; 
+            min-height: 100vh;
             padding: 20px;
         }
 
@@ -49,257 +41,70 @@
             100% { background-position: 0% 50%; }
         }
 
-        .header-logo {
-            text-align: center;
-            margin-bottom: 25px;
-        }
-
-        .logo-title {
-            font-size: 2.2rem;
-            font-weight: 800;
-            letter-spacing: -0.03em;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-        }
-
-        .logo-title span { color: #38bdf8; }
-        .logo-subtitle { font-size: 0.95rem; color: var(--text-muted); margin-top: 5px; }
-
-        .card { 
+        .login-card { 
             background: var(--card-bg); 
             border-radius: 24px; 
-            padding: 35px; 
+            padding: 40px 30px; 
             box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.15); 
             border: 1px solid var(--card-border);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             width: 100%; 
-            max-width: 420px; 
+            max-width: 400px;
             text-align: center;
         }
 
-        h2 { font-size: 1.4rem; font-weight: 700; margin-bottom: 25px; }
+        .logo-area h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 5px; color: white; }
+        .logo-area span { color: #38bdf8; }
+        .logo-area p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 35px; }
 
-        .tabs-perfil {
-            display: flex;
-            background: rgba(15, 23, 42, 0.4);
-            padding: 6px;
-            border-radius: 14px;
-            margin-bottom: 25px;
-            border: 1px solid rgba(255, 255, 255, 0.05);
-        }
+        h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: white; text-align: left; text-transform: uppercase; letter-spacing: 0.03em; }
 
-        .tab-btn {
-            flex: 1;
-            padding: 12px;
-            border: none;
-            background: transparent;
-            font-size: 0.95rem;
-            font-weight: 600;
-            color: var(--text-muted);
-            cursor: pointer;
-            border-radius: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            transition: all 0.2s;
-        }
+        .form-group { text-align: left; margin-bottom: 20px; }
+        label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
+        input { width: 100%; padding: 14px 16px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; font-size: 0.95rem; background-color: var(--input-bg); color: white; outline: none; transition: all 0.3s; }
+        input:focus { border-color: #60a5fa; background: rgba(15, 23, 42, 0.8); box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15); }
 
-        .tab-btn.active {
-            background: var(--primary);
-            color: white;
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        .form-group { 
-            margin-bottom: 20px; 
-            text-align: left;
-        }
-        
-        .form-group label { 
-            display: block; 
-            font-size: 0.8rem; 
-            font-weight: 700; 
-            margin-bottom: 10px; 
-            color: var(--text-muted); 
-            text-transform: uppercase; 
-            letter-spacing: 0.05em; 
-        }
-        
-        .input-container {
-            position: relative;
-            display: flex;
-            align-items: center;
-        }
-
-        .form-group input { 
-            width: 100%; 
-            padding: 16px; 
-            padding-right: 45px; 
-            border: 1px solid rgba(255, 255, 255, 0.15); 
-            border-radius: 14px; 
-            font-size: 1rem; 
-            background-color: var(--input-bg); 
-            color: white; 
-            outline: none; 
-            transition: all 0.3s; 
-        }
-        
-        .form-group input:focus { 
-            border-color: #60a5fa; 
-            background: rgba(15, 23, 42, 0.8); 
-            box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15); 
-        }
-
-        .btn-olhinho {
-            position: absolute;
-            right: 15px;
-            background: none;
-            border: none;
-            color: var(--text-muted);
-            cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 5px;
-            transition: color 0.2s;
-        }
-
-        .btn-olhinho:hover { color: white; }
-        
-        .btn-submit { 
-            width: 100%; 
-            padding: 16px; 
-            background-color: var(--primary); 
-            color: white; 
-            border: none; 
-            border-radius: 14px; 
-            font-weight: 700; 
-            font-size: 1rem; 
-            cursor: pointer; 
-            transition: all 0.2s; 
-            box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3);
-        }
-
-        .btn-submit:hover { 
-            background-color: var(--primary-hover); 
-            transform: translateY(-2px); 
-        }
-
-        .error-message {
-            background-color: var(--danger-bg);
-            color: var(--danger-text);
-            border: 1px solid rgba(239, 68, 68, 0.2);
-            padding: 12px;
-            border-radius: 12px;
-            font-size: 0.9rem;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            justify-content: center;
-        }
-
-        .hidden { display: none !important; }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn:active { transform: translateY(0); }
     </style>
 </head>
 <body>
 
-    <header class="header-logo">
-        <div class="logo-title">🏆 Info<span>Sport</span></div>
-        <p class="logo-subtitle">Placar Esportivo Conectado em Tempo Real</p>
-    </header>
-
-    <main class="card">
-        <h2>Painel de Acesso</h2>
-
-        <div class="tabs-perfil">
-            <button class="tab-btn active" id="tabArbitro" onclick="mudarPerfil('arbitro')">⚗️ Árbitro</button>
-            <button class="tab-btn" id="tabAluno" onclick="mudarPerfil('aluno')">📱 Aluno</button>
+    <div class="login-card">
+        <div class="logo-area">
+            <h1>Info<span>Sport</span></h1>
+            <p>Painel de Arbitragem Escolar</p>
         </div>
 
-        <div id="erroMensagem" class="error-message hidden">
-            ❌ <span id="erroTexto">Senha inválida! Tente novamente.</span>
+        <div class="form-group">
+            <h3>🔐 Acesso do Árbitro</h3>
+            <label for="chaveArbitro">Chave de Segurança</label>
+            <input type="password" id="chaveArbitro" placeholder="Digite a chave do organizador">
         </div>
 
-        <section id="formArbitro">
-            <div class="form-group">
-                <label for="inputSenha">Senha do Painel</label>
-                <div class="input-container">
-                    <input type="password" id="inputSenha" placeholder="Digite a senha secreta">
-                    <button type="button" class="btn-olhinho" onclick="toggleSenha()">
-                        <svg id="svgOlha" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
-                    </button>
-                </div>
-            </div>
-            <button class="btn-submit" onclick="acessarComoArbitro()">Acessar Ferramentas</button>
-        </section>
-
-        <section id="formAluno" class="hidden">
-            <div class="form-group">
-                <label for="inputCodigo">Código do Jogo</label>
-                <input type="text" id="inputCodigo" placeholder="Ex: jogo_9876">
-            </div>
-            <button class="btn-submit" onclick="acessarComoAluno()">Assistir Partida</button>
-        </section>
-    </main>
+        <button class="btn" onclick="entrarComoArbitro()">Entrar no Painel 🛠️</button>
+    </div>
 
     <script>
-        let perfilAtual = 'arbitro';
-
-        function mudarPerfil(perfil) {
-            perfilAtual = perfil;
-            document.getElementById('erroMensagem').classList.add('hidden');
+        function entrarComoArbitro() {
+            const chave = document.getElementById('chaveArbitro').value.trim();
             
-            if (perfil === 'arbitro') {
-                document.getElementById('tabArbitro').classList.add('active');
-                document.getElementById('tabAluno').classList.remove('active');
-                document.getElementById('formArbitro').classList.remove('hidden');
-                document.getElementById('formAluno').classList.add('hidden');
-            } else {
-                document.getElementById('tabAluno').classList.add('active');
-                document.getElementById('tabArbitro').classList.remove('active');
-                document.getElementById('formAluno').classList.remove('hidden');
-                document.getElementById('formArbitro').classList.add('hidden');
-            }
-        }
-
-        function toggleSenha() {
-            const input = document.getElementById('inputSenha');
-            const svg = document.getElementById('svgOlha');
             
-            if (input.type === 'password') {
-                input.type = 'text';
-                svg.innerHTML = '<path d="M9.88 9.88a3 3 0 1 0 4.24 4.24"/><path d="M10.73 5.08A10.43 10.43 0 0 1 12 5c7 0 10 7 10 7a13.16 13.16 0 0 1-1.67 2.68"/><path d="M6.61 6.61A13.52 13.52 0 0 0 2 12s3 7 10 7a9.74 9.74 0 0 0 5.39-1.61"/><line x1="2" y1="2" x2="22" y2="22"/>';
-            } else {
-                input.type = 'password';
-                svg.innerHTML = '<path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/>';
-            }
-        }
-
-        function acessarComoArbitro() {
-            const senha = document.getElementById('inputSenha').value;
-            const erroContainer = document.getElementById('erroMensagem');
-            
-            if (senha === "045") {
-                erroContainer.classList.add('hidden');
+            if (chave === 'admin' || chave === '1234') {
                 window.location.href = "jogo.html?modo=arbitro";
+            } else if (chave === "") {
+                alert("Por favor, digite a chave de acesso.");
             } else {
-                erroContainer.classList.remove('hidden');
+                alert("Chave de acesso incorreta!");
             }
         }
 
-        function acessarComoAluno() {
-            const codigo = document.getElementById('inputCodigo').value.trim();
-            if (codigo) {
-                window.location.href = `jogo.html?sala=${codigo}&modo=publico`;
-            } else {
-                alert("Por favor, insira o código da partida.");
-            }
-        }
+        
+        document.getElementById('chaveArbitro').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') entrarComoArbitro();
+        });
     </script>
 </body>
 </html>
