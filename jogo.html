@@ -8,7 +8,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
     <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
 
     <style>
         :root {
@@ -91,8 +91,8 @@
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
 
         .share-container { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        #qrcode { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
-        #qrcode img { display: block; margin: 0 auto; }
+        #qrcode-wrapper { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
+        #qrcode-canvas { display: block; margin: 0 auto; }
 
         .hidden { display: none !important; }
         @media (max-width: 500px) { .form-row, .grid-controles { grid-template-columns: 1fr; } .form-group.full { grid-column: span 1; } }
@@ -161,7 +161,9 @@
         <h3>📱 Link da Torcida (Alunos)</h3>
         <div class="share-container">
             <p style="color: var(--text-muted); font-size: 0.9rem;">Os alunos podem entrar escaneando o QR Code abaixo:</p>
-            <div id="qrcode"></div>
+            <div id="qrcode-wrapper">
+                <canvas id="qrcode-canvas"></canvas>
+            </div>
         </div>
     </main>
 
@@ -238,16 +240,15 @@
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
-            
             let urlLimpa = window.location.href.split('?')[0];
             
+           
             if (!urlLimpa.includes('Protótipo/jogo.html') && !urlLimpa.includes('Prototipe/jogo.html')) {
                 if (urlLimpa.endsWith('/')) {
                     urlLimpa += 'Protótipo/jogo.html';
-                } else if (urlLimpa.endsWith('Protótipo') || urlLimpa.endsWith('Protótipo/')) {
-                    urlLimpa = urlLimpa.replace(/Protótipo\/?$/, 'Protótipo/jogo.html');
+                } else if (urlLimpa.endsWith('Protótipo')) {
+                    urlLimpa += '/jogo.html';
                 } else {
-                   
                     const baseIdx = urlLimpa.indexOf('/t-picos-emergentes-em-inform-tica');
                     if (baseIdx !== -1) {
                         urlLimpa = urlLimpa.substring(0, baseIdx) + '/t-picos-emergentes-em-inform-tica/Protótipo/jogo.html';
@@ -255,16 +256,17 @@
                 }
             }
             
-            const urlTorcida = `${urlLimpa}?sala=${salaId}&modo=publico`;
+
+            const urlTorcida = `${urlLimpa}?sala=${encodeURIComponent(salaId)}&modo=publico`;
             
-            document.getElementById('qrcode').innerHTML = "";
-            new QRCode(document.getElementById("qrcode"), {
-                text: urlTorcida,
-                width: 200,
-                height: 200,
-                colorDark : "#0f172a",
-                colorLight : "#ffffff",
-                correctLevel : QRCode.CorrectLevel.H
+          
+            new QRious({
+                element: document.getElementById('qrcode-canvas'),
+                value: urlTorcida,
+                size: 200,
+                background: '#ffffff',
+                foreground: '#0f172a',
+                level: 'H'
             });
         }
 
