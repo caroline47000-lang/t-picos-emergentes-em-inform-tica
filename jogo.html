@@ -91,7 +91,7 @@
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
 
         .share-container { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        #qrcode { background: white; padding: 12px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
+        #qrcode { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
         #qrcode img { display: block; margin: 0 auto; }
 
         .hidden { display: none !important; }
@@ -238,19 +238,12 @@
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
-            
-            let urlBase = window.location.href.split('?')[0];
-            
-            
-            if (urlBase.startsWith('file:///')) {
-                urlBase = "https://infosport-live.vercel.app/jogo.html"; 
-            }
-
-            const urlTorcida = `${urlBase}?sala=${salaId}&modo=publico`;
+      
+            const urlCelular = `https://visualizador-placar.github.io/torcida/?sala=${salaId}`;
             
             document.getElementById('qrcode').innerHTML = "";
             new QRCode(document.getElementById("qrcode"), {
-                text: urlTorcida,
+                text: urlCelular,
                 width: 180,
                 height: 180,
                 colorDark : "#0f172a",
@@ -273,6 +266,12 @@
                 pA: pontuacao.A,
                 pB: pontuacao.B
             });
+        }
+
+        function poolNovosDados() {
+            if(canalAbly) {
+                canalAbly.publish('pedir_status', {});
+            }
         }
 
         function encerrarPartida() {
