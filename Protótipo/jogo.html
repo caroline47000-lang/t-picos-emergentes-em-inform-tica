@@ -158,9 +158,9 @@
     </main>
 
     <main id="containerCompartilhar" class="card hidden">
-        <h3>📱 Acesso Direto da Torcida</h3>
+        <h3>📱 Link da Torcida (Alunos)</h3>
         <div class="share-container">
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Abra a câmera do celular para assistir ao placar ao vivo:</p>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Os alunos podem entrar escaneando o QR Code abaixo:</p>
             <div id="qrcode"></div>
         </div>
     </main>
@@ -238,14 +238,17 @@
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
+           
+            let urlBase = window.location.href.split('?')[0];
             
-            const urlCelular = `https://visualizador-placar.github.io/torcida/?sala=${salaId}`;
+            
+            const urlTorcida = `${urlBase}?sala=${salaId}&modo=publico`;
             
             document.getElementById('qrcode').innerHTML = "";
             new QRCode(document.getElementById("qrcode"), {
-                text: urlCelular,
-                width: 180,
-                height: 180,
+                text: urlTorcida,
+                width: 200,
+                height: 200,
                 colorDark : "#0f172a",
                 colorLight : "#ffffff",
                 correctLevel : QRCode.CorrectLevel.H
@@ -266,12 +269,6 @@
                 pA: pontuacao.A,
                 pB: pontuacao.B
             });
-        }
-
-        function poolNovosDados() {
-            if(canalAbly) {
-                canalAbly.publish('pedir_status', {});
-            }
         }
 
         function encerrarPartida() {
