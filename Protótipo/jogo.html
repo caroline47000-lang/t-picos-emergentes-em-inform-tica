@@ -98,7 +98,7 @@
 
         .status-encerrado { display: none; background: #ef4444; color: white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
 
-        
+       
         .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 300px; overflow-y: auto; padding-right: 5px; }
         .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
         .historico-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -221,6 +221,13 @@
         };
 
         function inicializarPartida() {
+           
+            pontuacao.A = 0;
+            pontuacao.B = 0;
+            document.getElementById('pontosADisplay').textContent = "0";
+            document.getElementById('pontosBDisplay').textContent = "0";
+            document.getElementById('bannerEncerrado').style.display = 'none';
+
             const timestampUnico = Date.now().toString().slice(-5);
             const aleatorioUnico = Math.floor(100 + Math.random() * 900);
             salaId = "jogo_" + timestampUnico + aleatorioUnico;
@@ -247,6 +254,11 @@
         }
 
         function conectarAoCanal() {
+            if (ably) {
+                
+                if (canalAbly) canalAbly.unsubscribe();
+            }
+
             ably = new Ably.Realtime({ key: ABLY_KEY });
             canalAbly = ably.channels.get(salaId);
             canalHistorico = ably.channels.get('infosport_historico_global');
@@ -276,7 +288,7 @@
                 removerDoHistoricoLocal(msg.data.id);
             });
 
-            
+          
             setInterval(() => {
                 let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
                 if (modoUrl === 'arbitro' && deletados.length > 0) {
@@ -295,6 +307,8 @@
             let urlBaseSite = window.location.origin + window.location.pathname;
             const urlTorcida = `${urlBaseSite}?sala=${encodeURIComponent(salaId)}&modo=publico`;
             
+           
+            document.getElementById('qrcode-canvas').innerHTML = ""; 
             new QRious({
                 element: document.getElementById('qrcode-canvas'),
                 value: urlTorcida,
@@ -364,7 +378,6 @@
         }
 
         function salvarNoHistoricoLocal(partida) {
-            
             let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
             if (deletadosGlobais.includes(partida.id)) return;
 
@@ -377,11 +390,13 @@
         }
 
         function removerDoHistoricoLocal(idDeletar) {
-            
-            let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
-            if (!deletadosGlobais.includes(idDeletar)) {
-                deletadosGlobais.push(idDeletar);
-                localStorage.setItem('infosport_deletados_lista', JSON.stringify(deletadosGlobais));
+           
+            if (idDeletar !== salaId) {
+                let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+                if (!deletadosGlobais.includes(idDeletar)) {
+                    deletadosGlobais.push(idDeletar);
+                    localStorage.setItem('infosport_deletados_lista', JSON.stringify(deletadosGlobais));
+                }
             }
 
             let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
@@ -431,12 +446,10 @@
 
         function solicitarDeletarPartida(idPartida) {
             if (confirm("Quer mesmo apagar este jogo específico do histórico?")) {
-               
                 let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
                 if (!deletados.includes(idPartida)) deletados.push(idPartida);
                 localStorage.setItem('infosport_deletados', JSON.stringify(deletados));
 
-               
                 canalHistorico.publish('item_deletado', { id: idPartida });
                 removerDoHistoricoLocal(idPartida);
             }
