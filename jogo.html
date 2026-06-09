@@ -91,8 +91,8 @@
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
 
         .share-container { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        .code-box { background: rgba(56,189,248,0.1); border: 1px dashed #38bdf8; padding: 10px 25px; border-radius: 8px; font-size: 1.3rem; font-weight: 700; color: #38bdf8; font-family: monospace; letter-spacing: 1px; }
-        #qrcode { background: white; padding: 10px; border-radius: 12px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        #qrcode { background: white; padding: 12px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
+        #qrcode img { display: block; margin: 0 auto; }
 
         .hidden { display: none !important; }
         @media (max-width: 500px) { .form-row, .grid-controles { grid-template-columns: 1fr; } .form-group.full { grid-column: span 1; } }
@@ -158,10 +158,9 @@
     </main>
 
     <main id="containerCompartilhar" class="card hidden">
-        <h3>📱 Link da Torcida (Alunos)</h3>
+        <h3>📱 Acesso Direto da Torcida</h3>
         <div class="share-container">
-            <p style="color: var(--text-muted); font-size: 0.9rem;">Os alunos podem entrar com o código ou escaneando o QR Code:</p>
-            <div class="code-box" id="codigoSalaDisplay">jogo_xxxxx</div>
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Abra a câmera do celular para assistir ao placar ao vivo:</p>
             <div id="qrcode"></div>
         </div>
     </main>
@@ -171,7 +170,6 @@
         const modoUrl = urlParams.get('modo'); 
         let salaId = urlParams.get('sala');
 
-    
         const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho"; 
         let ably, canalAbly;
         let pontuacao = { A: 0, B: 0 };
@@ -230,7 +228,6 @@
                 document.getElementById('pontosADisplay').textContent = dados.pA;
                 document.getElementById('pontosBDisplay').textContent = dados.pB;
                 
-                
                 pontuacao.A = dados.pA;
                 pontuacao.B = dados.pB; 
             });
@@ -240,16 +237,25 @@
             document.getElementById('containerMonitor').classList.remove('hidden');
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
-            document.getElementById('codigoSalaDisplay').textContent = salaId;
 
-            const urlTorcida = `${window.location.origin}${window.location.pathname}?sala=${salaId}&modo=publico`;
+            
+            let urlBase = window.location.href.split('?')[0];
+            
+            
+            if (urlBase.startsWith('file:///')) {
+                urlBase = "https://infosport-live.vercel.app/jogo.html"; 
+            }
+
+            const urlTorcida = `${urlBase}?sala=${salaId}&modo=publico`;
+            
             document.getElementById('qrcode').innerHTML = "";
             new QRCode(document.getElementById("qrcode"), {
                 text: urlTorcida,
-                width: 140,
-                height: 140,
+                width: 180,
+                height: 180,
                 colorDark : "#0f172a",
-                colorLight : "#ffffff"
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
             });
         }
 
