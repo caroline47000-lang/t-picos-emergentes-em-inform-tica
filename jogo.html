@@ -98,7 +98,6 @@
 
         .status-encerrado { display: none; background: #ef4444; color: white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
 
-       
         .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 300px; overflow-y: auto; padding-right: 5px; }
         .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
         .historico-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -221,7 +220,6 @@
         };
 
         function inicializarPartida() {
-           
             pontuacao.A = 0;
             pontuacao.B = 0;
             document.getElementById('pontosADisplay').textContent = "0";
@@ -254,9 +252,8 @@
         }
 
         function conectarAoCanal() {
-            if (ably) {
-                
-                if (canalAbly) canalAbly.unsubscribe();
+            if (ably && canalAbly) {
+                canalAbly.unsubscribe();
             }
 
             ably = new Ably.Realtime({ key: ABLY_KEY });
@@ -276,10 +273,16 @@
 
                 if (dados.status === 'encerrado') {
                     document.getElementById('bannerEncerrado').style.display = 'block';
+                    
+                   
+                    if (modoUrl === 'publico') {
+                        setTimeout(() => {
+                            window.location.href = "index.html";
+                        }, 5000);
+                    }
                 }
             });
 
-          
             canalHistorico.subscribe('partida_salva', (msg) => {
                 salvarNoHistoricoLocal(msg.data);
             });
@@ -288,7 +291,6 @@
                 removerDoHistoricoLocal(msg.data.id);
             });
 
-          
             setInterval(() => {
                 let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
                 if (modoUrl === 'arbitro' && deletados.length > 0) {
@@ -304,15 +306,13 @@
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
-            let urlBaseSite = window.location.origin + window.location.pathname;
-            const urlTorcida = `${urlBaseSite}?sala=${encodeURIComponent(salaId)}&modo=publico`;
+            let urlCompleta = window.location.href.split('?')[0];
+            const urlTorcida = `${urlCompleta}?sala=${encodeURIComponent(salaId)}&modo=publico`;
             
-           
-            document.getElementById('qrcode-canvas').innerHTML = ""; 
             new QRious({
                 element: document.getElementById('qrcode-canvas'),
                 value: urlTorcida,
-                size: 200,
+                size: 210,
                 background: '#ffffff',
                 foreground: '#0f172a',
                 level: 'H'
@@ -390,7 +390,6 @@
         }
 
         function removerDoHistoricoLocal(idDeletar) {
-           
             if (idDeletar !== salaId) {
                 let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
                 if (!deletadosGlobais.includes(idDeletar)) {
@@ -410,7 +409,6 @@
             let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
             let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
 
-            
             historico = historico.filter(jogo => !deletadosGlobais.includes(jogo.id));
 
             if (historico.length === 0) {
