@@ -23,6 +23,7 @@
             --input-bg: rgba(15, 23, 42, 0.6);
             --success: #10b981;
             --success-hover: #059669;
+            --accent: #f59e0b;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -77,6 +78,8 @@
         .btn-success:hover { background-color: var(--success-hover); }
         .btn-secondary { background-color: rgba(255,255,255,0.1); color: white; }
         .btn-secondary:hover { background-color: rgba(255,255,255,0.2); }
+        .btn-accent { background-color: var(--accent); color: #0f172a; font-weight: 800; box-shadow: 0 4px 15px rgba(245, 158, 11, 0.3); }
+        .btn-accent:hover { background-color: #f59e0b; opacity: 0.9; }
 
         .placar-box { background: rgba(15, 23, 42, 0.8); border-radius: 16px; padding: 25px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
         .badge-mod { background: var(--primary); padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin: 0 auto 15px auto; display: table; }
@@ -93,6 +96,14 @@
         .share-container { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         #qrcode-wrapper { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
         #qrcode-canvas { display: block; margin: 0 auto; }
+
+        /* Estilos do Histórico */
+        .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 250px; overflow-y: auto; padding-right: 5px; }
+        .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
+        .historico-info { display: flex; flex-direction: column; }
+        .historico-mod { font-size: 0.75rem; text-transform: uppercase; color: #60a5fa; font-weight: 700; }
+        .historico-times { font-size: 0.9rem; font-weight: 600; color: white; margin-top: 2px; }
+        .historico-placar { font-family: monospace; font-size: 1.1rem; font-weight: 800; color: var(--accent); }
 
         .hidden { display: none !important; }
         @media (max-width: 500px) { .form-row, .grid-controles { grid-template-columns: 1fr; } .form-group.full { grid-column: span 1; } }
@@ -134,6 +145,15 @@
                 <div class="score-num" id="pontosBDisplay">0</div>
             </div>
         </div>
+
+        <button id="btnHistorico" class="btn btn-secondary" style="margin-top: 15px;" onclick="alternarVisibilidadeHistorico()">📋 Ver Jogos Anteriores</button>
+        
+        <div id="secaoHistorico" class="hidden" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <h4 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 10px; text-align: left;">Partidas Encerradas</h4>
+            <div id="listaHistorico" class="historico-lista">
+                <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogo registrado ainda.</p>
+            </div>
+        </div>
     </main>
 
     <main id="containerMesa" class="card hidden">
@@ -173,7 +193,7 @@
         let salaId = urlParams.get('sala');
 
         const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho"; 
-        let ably, canalAbly;
+        let ably, canalAbly, canalHistorico;
         let pontuacao = { A: 0, B: 0 };
 
         window.onload = function() {
@@ -187,6 +207,7 @@
             } else if (modoUrl === 'publico' && salaId) {
                 conectarAoCanal();
                 document.getElementById('containerMonitor').classList.remove('hidden');
+                carregarHistoricoLocal();
             } else {
                 window.location.href = "index.html";
             }
@@ -221,6 +242,9 @@
         function conectarAoCanal() {
             ably = new Ably.Realtime({ key: ABLY_KEY });
             canalAbly = ably.channels.get(salaId);
+            
+           
+            canalHistorico = ably.channels.get('infosport_historico_global');
 
             canalAbly.subscribe('atualizacao', (msg) => {
                 const dados = msg.data;
@@ -233,6 +257,11 @@
                 pontuacao.A = dados.pA;
                 pontuacao.B = dados.pB; 
             });
+
+            // Alunos escutam quando um jogo é encerrado para atualizar a lista na hora
+            canalHistorico.subscribe('partida_salva', (msg) => {
+                salvarNoHistoricoLocal(msg.data);
+            });
         }
 
         function renderizarPaineisArbitro() {
@@ -242,7 +271,6 @@
 
             let urlLimpa = window.location.href.split('?')[0];
             
-           
             if (!urlLimpa.includes('Protótipo/jogo.html') && !urlLimpa.includes('Prototipe/jogo.html')) {
                 if (urlLimpa.endsWith('/')) {
                     urlLimpa += 'Protótipo/jogo.html';
@@ -256,10 +284,8 @@
                 }
             }
             
-
             const urlTorcida = `${urlLimpa}?sala=${encodeURIComponent(salaId)}&modo=publico`;
             
-          
             new QRious({
                 element: document.getElementById('qrcode-canvas'),
                 value: urlTorcida,
@@ -287,10 +313,80 @@
         }
 
         function encerrarPartida() {
-            if (confirm("Deseja encerrar a transmissão?")) {
-                if (canalAbly) canalAbly.detach();
-                window.location.href = "index.html";
+            if (confirm("Deseja encerrar e SALVAR esta partida no histórico?")) {
+                const dadosFinais = {
+                    modalidade: document.getElementById('modalidadeDisplay').textContent,
+                    timeA: document.getElementById('nomeTimeADisplay').textContent,
+                    timeB: document.getElementById('nomeTimeBDisplay').textContent,
+                    pA: pontuacao.A,
+                    pB: pontuacao.B,
+                    id: salaId
+                };
+
+               
+                canalHistorico.publish('partida_salva', dadosFinais);
+
+                setTimeout(() => {
+                    if (canalAbly) canalAbly.detach();
+                    window.location.href = "index.html";
+                }, 500);
             }
+        }
+
+       
+        function alternarVisibilidadeHistorico() {
+            const secao = document.getElementById('secaoHistorico');
+            const btn = document.getElementById('btnHistorico');
+            if (secao.classList.contains('hidden')) {
+                secao.classList.remove('hidden');
+                btn.textContent = "🙈 Ocultar Jogos Anteriores";
+                carregarHistoricoLocal();
+            } else {
+                secao.classList.add('hidden');
+                btn.textContent = "📋 Ver Jogos Anteriores";
+            }
+        }
+
+        function salvarNoHistoricoLocal(partida) {
+            let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+            
+            if (!historico.some(item => item.id === partida.id)) {
+                historico.unshift(partida);
+                localStorage.setItem('infosport_historico', JSON.stringify(historico));
+                if (!document.getElementById('secaoHistorico').classList.contains('hidden')) {
+                    carregarHistoricoLocal();
+                }
+            }
+        }
+
+        function carregarHistoricoLocal() {
+            const listaDiv = document.getElementById('listaHistorico');
+            let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+
+            if (historico.length === 0) {
+                listaDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogo registrado ainda.</p>`;
+                return;
+            }
+
+            listaDiv.innerHTML = "";
+            historico.forEach(jogo => {
+                const item = document.createElement('div');
+                item.className = 'historico-item';
+                item.innerHTML = `
+                    <div class="historico-info">
+                        <span class="historico-mod">${escapeHTML(jogo.modalidade)}</span>
+                        <span class="historico-times">${escapeHTML(jogo.timeA)} vs ${escapeHTML(jogo.timeB)}</span>
+                    </div>
+                    <div class="historico-placar">${jogo.pA} - ${jogo.pB}</div>
+                `;
+                listaDiv.appendChild(item);
+            });
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
         }
     </script>
 </body>
