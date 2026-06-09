@@ -79,8 +79,6 @@
         .btn-success:hover { background-color: var(--success-hover); }
         .btn-secondary { background-color: rgba(255,255,255,0.1); color: white; }
         .btn-secondary:hover { background-color: rgba(255,255,255,0.2); }
-        .btn-danger { background-color: rgba(239, 68, 68, 0.2); color: #f87171; border: 1px solid rgba(239, 68, 68, 0.4); }
-        .btn-danger:hover { background-color: rgba(239, 68, 68, 0.4); }
 
         .placar-box { background: rgba(15, 23, 42, 0.8); border-radius: 16px; padding: 25px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
         .badge-mod { background: var(--primary); padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin: 0 auto 15px auto; display: table; }
@@ -95,19 +93,23 @@
         .btn-group { display: flex; flex-direction: column; gap: 10px; }
 
         .share-container { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
-        #qrcode-wrapper { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; }
+        #qrcode-wrapper { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; min-width: 228px; min-height: 228px; }
         #qrcode-canvas { display: block; margin: 0 auto; }
 
-        
         .status-encerrado { display: none; background: #ef4444; color: white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
 
-        
-        .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 250px; overflow-y: auto; padding-right: 5px; }
-        .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; }
-        .historico-info { display: flex; flex-direction: column; }
+       
+        .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .historico-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
         .historico-mod { font-size: 0.75rem; text-transform: uppercase; color: #60a5fa; font-weight: 700; }
-        .historico-times { font-size: 0.9rem; font-weight: 600; color: white; margin-top: 2px; }
+        .historico-times { font-size: 0.9rem; font-weight: 600; color: white; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .historico-placar-box { display: flex; align-items: center; gap: 15px; }
         .historico-placar { font-family: monospace; font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+        
+       
+        .btn-deletar-item { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.9rem; }
+        .btn-deletar-item:hover { background: rgba(239, 68, 68, 0.35); color: #ffffff; transform: scale(1.05); }
 
         .hidden { display: none !important; }
         @media (max-width: 500px) { .form-row, .grid-controles { grid-template-columns: 1fr; } .form-group.full { grid-column: span 1; } }
@@ -159,8 +161,6 @@
             <div id="listaHistorico" class="historico-lista">
                 <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogo registrado ainda.</p>
             </div>
-            
-            <button id="btnLimparHistorico" class="btn btn-danger hidden" style="margin-top: 15px; padding: 10px; font-size: 0.85rem;" onclick="limparHistoricoGlobal()">🗑️ Apagar Todos os Jogos Anteriores</button>
         </div>
     </main>
 
@@ -206,9 +206,6 @@
 
         window.onload = function() {
             if (modoUrl === 'arbitro') {
-                
-                document.getElementById('btnLimparHistorico').classList.remove('hidden');
-                
                 if (!salaId) {
                     document.getElementById('containerCriar').classList.remove('hidden');
                 } else {
@@ -261,25 +258,23 @@
                 document.getElementById('nomeTimeADisplay').textContent = dados.timeA;
                 document.getElementById('nomeTimeBDisplay').textContent = dados.timeB;
                 document.getElementById('pontosADisplay').textContent = dados.pA;
-                document.getElementById('pontosBDisplay').textContent = dados.pb || dados.pB; // tolerância a minúsculo
+                document.getElementById('pontosBDisplay').textContent = dados.pB;
                 
                 pontuacao.A = dados.pA;
-                pontuacao.B = dados.pb || dados.pB; 
+                pontuacao.B = dados.pB; 
 
-               
                 if (dados.status === 'encerrado') {
                     document.getElementById('bannerEncerrado').style.display = 'block';
                 }
             });
 
-            
+           
             canalHistorico.subscribe('partida_salva', (msg) => {
                 salvarNoHistoricoLocal(msg.data);
             });
 
-            canalHistorico.subscribe('historico_limpo', () => {
-                localStorage.removeItem('infosport_historico');
-                carregarHistoricoLocal();
+            canalHistorico.subscribe('item_deletado', (msg) => {
+                removerDoHistoricoLocal(msg.data.id);
             });
         }
 
@@ -288,22 +283,8 @@
             document.getElementById('containerMesa').classList.remove('hidden');
             document.getElementById('containerCompartilhar').classList.remove('hidden');
 
-            let urlLimpa = window.location.href.split('?')[0];
-            
-            if (!urlLimpa.includes('Protótipo/jogo.html') && !urlLimpa.includes('Prototipe/jogo.html')) {
-                if (urlLimpa.endsWith('/')) {
-                    urlLimpa += 'Protótipo/jogo.html';
-                } else if (urlLimpa.endsWith('Protótipo')) {
-                    urlLimpa += '/jogo.html';
-                } else {
-                    const baseIdx = urlLimpa.indexOf('/t-picos-emergentes-em-inform-tica');
-                    if (baseIdx !== -1) {
-                        urlLimpa = urlLimpa.substring(0, baseIdx) + '/t-picos-emergentes-em-inform-tica/Protótipo/jogo.html';
-                    }
-                }
-            }
-            
-            const urlTorcida = `${urlLimpa}?sala=${encodeURIComponent(salaId)}&modo=publico`;
+            let urlBaseSite = window.location.origin + window.location.pathname;
+            const urlTorcida = `${urlBaseSite}?sala=${encodeURIComponent(salaId)}&modo=publico`;
             
             new QRious({
                 element: document.getElementById('qrcode-canvas'),
@@ -343,7 +324,6 @@
                     id: salaId
                 };
 
-                
                 canalAbly.publish('atualizacao', {
                     modalidade: dadosFinais.modalidade,
                     timeA: dadosFinais.timeA,
@@ -353,10 +333,8 @@
                     status: 'encerrado'
                 });
 
-               
                 canalHistorico.publish('partida_salva', dadosFinais);
 
-                
                 setTimeout(() => {
                     window.location.href = "index.html";
                 }, 1500); 
@@ -385,6 +363,13 @@
             }
         }
 
+        function removerDoHistoricoLocal(idDeletar) {
+            let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+            historico = historico.filter(jogo => jogo.id !== idDeletar);
+            localStorage.setItem('infosport_historico', JSON.stringify(historico));
+            carregarHistoricoLocal();
+        }
+
         function carregarHistoricoLocal() {
             const listaDiv = document.getElementById('listaHistorico');
             let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
@@ -398,21 +383,34 @@
             historico.forEach(jogo => {
                 const item = document.createElement('div');
                 item.className = 'historico-item';
-                item.innerHTML = `
+                
+                
+                let conteudoHTML = `
                     <div class="historico-info">
                         <span class="historico-mod">${escapeHTML(jogo.modalidade)}</span>
                         <span class="historico-times">${escapeHTML(jogo.timeA)} vs ${escapeHTML(jogo.timeB)}</span>
                     </div>
-                    <div class="historico-placar">${jogo.pA} - ${jogo.pB}</div>
+                    <div class="historico-placar-box">
+                        <div class="historico-placar">${jogo.pA} - ${jogo.pB}</div>
                 `;
+
+                
+                if (modoUrl === 'arbitro') {
+                    conteudoHTML += `
+                        <button class="btn-deletar-item" title="Apagar esta partida" onclick="solicitarDeletarPartida('${jogo.id}')">🗑️</button>
+                    `;
+                }
+
+                conteudoHTML += `</div>`;
+                item.innerHTML = conteudoHTML;
                 listaDiv.appendChild(item);
             });
         }
 
-       
-        function limparHistoricoGlobal() {
-            if (confirm("🚨 ATENÇÃO: Você quer apagar DEFINITIVAMENTE todo o histórico de jogos anteriores? Esta ação não pode ser desfeita!")) {
-                canalHistorico.publish('historico_limpo', {});
+        
+        function solicitarDeletarPartida(idPartida) {
+            if (confirm("Quer mesmo apagar este jogo específico do histórico?")) {
+                canalHistorico.publish('item_deletado', { id: idPartida });
             }
         }
 
