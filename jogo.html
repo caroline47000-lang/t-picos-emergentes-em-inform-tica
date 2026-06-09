@@ -98,7 +98,7 @@
 
         .status-encerrado { display: none; background: #ef4444; color: white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
 
-       
+        
         .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 300px; overflow-y: auto; padding-right: 5px; }
         .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
         .historico-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
@@ -107,7 +107,6 @@
         .historico-placar-box { display: flex; align-items: center; gap: 15px; }
         .historico-placar { font-family: monospace; font-size: 1.1rem; font-weight: 800; color: var(--accent); }
         
-       
         .btn-deletar-item { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.9rem; }
         .btn-deletar-item:hover { background: rgba(239, 68, 68, 0.35); color: #ffffff; transform: scale(1.05); }
 
@@ -268,7 +267,7 @@
                 }
             });
 
-           
+          
             canalHistorico.subscribe('partida_salva', (msg) => {
                 salvarNoHistoricoLocal(msg.data);
             });
@@ -276,6 +275,16 @@
             canalHistorico.subscribe('item_deletado', (msg) => {
                 removerDoHistoricoLocal(msg.data.id);
             });
+
+            
+            setInterval(() => {
+                let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
+                if (modoUrl === 'arbitro' && deletados.length > 0) {
+                    deletados.forEach(id => {
+                        canalHistorico.publish('item_deletado', { id: id });
+                    });
+                }
+            }, 5000);
         }
 
         function renderizarPaineisArbitro() {
@@ -355,6 +364,10 @@
         }
 
         function salvarNoHistoricoLocal(partida) {
+            
+            let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+            if (deletadosGlobais.includes(partida.id)) return;
+
             let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
             if (!historico.some(item => item.id === partida.id)) {
                 historico.unshift(partida);
@@ -364,6 +377,13 @@
         }
 
         function removerDoHistoricoLocal(idDeletar) {
+            
+            let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+            if (!deletadosGlobais.includes(idDeletar)) {
+                deletadosGlobais.push(idDeletar);
+                localStorage.setItem('infosport_deletados_lista', JSON.stringify(deletadosGlobais));
+            }
+
             let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
             historico = historico.filter(jogo => jogo.id !== idDeletar);
             localStorage.setItem('infosport_historico', JSON.stringify(historico));
@@ -373,6 +393,10 @@
         function carregarHistoricoLocal() {
             const listaDiv = document.getElementById('listaHistorico');
             let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+            let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+
+            
+            historico = historico.filter(jogo => !deletadosGlobais.includes(jogo.id));
 
             if (historico.length === 0) {
                 listaDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogo registrado ainda.</p>`;
@@ -384,7 +408,6 @@
                 const item = document.createElement('div');
                 item.className = 'historico-item';
                 
-                
                 let conteudoHTML = `
                     <div class="historico-info">
                         <span class="historico-mod">${escapeHTML(jogo.modalidade)}</span>
@@ -394,7 +417,6 @@
                         <div class="historico-placar">${jogo.pA} - ${jogo.pB}</div>
                 `;
 
-                
                 if (modoUrl === 'arbitro') {
                     conteudoHTML += `
                         <button class="btn-deletar-item" title="Apagar esta partida" onclick="solicitarDeletarPartida('${jogo.id}')">🗑️</button>
@@ -407,10 +429,16 @@
             });
         }
 
-        
         function solicitarDeletarPartida(idPartida) {
             if (confirm("Quer mesmo apagar este jogo específico do histórico?")) {
+               
+                let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
+                if (!deletados.includes(idPartida)) deletados.push(idPartida);
+                localStorage.setItem('infosport_deletados', JSON.stringify(deletados));
+
+               
                 canalHistorico.publish('item_deletado', { id: idPartida });
+                removerDoHistoricoLocal(idPartida);
             }
         }
 
