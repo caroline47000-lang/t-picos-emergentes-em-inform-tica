@@ -3,11 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>InfoSport - Login do Árbitro</title>
+    <title>InfoSport - Partida em Tempo Real</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    
+    <script src="https://cdn.ably.com/lib/ably.min-1.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+
     <style>
         :root {
             --primary: #2563eb;
@@ -19,6 +21,10 @@
             --text-main: #ffffff;
             --text-muted: #94a3b8;
             --input-bg: rgba(15, 23, 42, 0.6);
+            --success: #10b981;
+            --success-hover: #059669;
+            --accent: #f59e0b;
+            --danger: #ef4444;
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Inter', sans-serif; }
@@ -29,10 +35,11 @@
             animation: gradientBg 15s ease infinite;
             color: var(--text-main);
             display: flex;
+            flex-direction: column;
             align-items: center;
-            justify-content: center;
+            justify-content: flex-start;
             min-height: 100vh;
-            padding: 20px;
+            padding: 30px 20px;
         }
 
         @keyframes gradientBg {
@@ -41,62 +48,423 @@
             100% { background-position: 0% 50%; }
         }
 
-        .login-card { 
+        .card { 
             background: var(--card-bg); 
             border-radius: 24px; 
-            padding: 40px 30px; 
+            padding: 30px; 
             box-shadow: 0 40px 100px -20px rgba(0, 0, 0, 0.6), inset 0 1px 0px rgba(255, 255, 255, 0.15); 
             border: 1px solid var(--card-border);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
             width: 100%; 
-            max-width: 400px;
+            max-width: 650px;
+            margin-bottom: 25px;
             text-align: center;
         }
 
-        .logo-area h1 { font-size: 2rem; font-weight: 800; letter-spacing: -0.03em; margin-bottom: 5px; color: white; }
-        .logo-area span { color: #38bdf8; }
-        .logo-area p { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 35px; }
+        h3 { font-size: 1.25rem; font-weight: 700; margin-bottom: 20px; display: flex; align-items: center; justify-content: center; gap: 10px; }
 
-        h3 { font-size: 1.1rem; font-weight: 700; margin-bottom: 15px; color: white; text-align: left; text-transform: uppercase; letter-spacing: 0.03em; }
-
-        .form-group { text-align: left; margin-bottom: 20px; }
+        .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 15px; }
+        .form-group { text-align: center; margin-bottom: 15px; }
+        .form-group.full { grid-column: span 2; }
+        
         label { display: block; font-size: 0.75rem; font-weight: 700; margin-bottom: 8px; color: var(--text-muted); text-transform: uppercase; letter-spacing: 0.05em; }
-        input { width: 100%; padding: 14px 16px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; font-size: 0.95rem; background-color: var(--input-bg); color: white; outline: none; transition: all 0.3s; text-align: center; }
-        input:focus { border-color: #60a5fa; background: rgba(15, 23, 42, 0.8); box-shadow: 0 0 0 4px rgba(96, 165, 250, 0.15); }
+        input { width: 100%; padding: 14px; border: 1px solid rgba(255, 255, 255, 0.15); border-radius: 12px; font-size: 0.95rem; background-color: var(--input-bg); color: white; outline: none; transition: all 0.3s; text-align: center; }
+        input:focus { border-color: #60a5fa; background: rgba(15, 23, 42, 0.8); }
 
-        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
-        .btn:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
-        .btn:active { transform: translateY(0); }
+        .btn { width: 100%; padding: 15px; border: none; border-radius: 12px; font-weight: 700; font-size: 1rem; cursor: pointer; transition: all 0.2s; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .btn-primary { background-color: var(--primary); color: white; box-shadow: 0 4px 15px rgba(37, 99, 235, 0.3); }
+        .btn-primary:hover { background-color: var(--primary-hover); transform: translateY(-1px); }
+        .btn-success { background-color: var(--success); color: white; }
+        .btn-success:hover { background-color: var(--success-hover); }
+        .btn-secondary { background-color: rgba(255,255,255,0.1); color: white; }
+        .btn-secondary:hover { background-color: rgba(255,255,255,0.2); }
+
+        .placar-box { background: rgba(15, 23, 42, 0.8); border-radius: 16px; padding: 25px; margin: 15px 0; border: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; justify-content: space-between; }
+        .badge-mod { background: var(--primary); padding: 4px 14px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; text-transform: uppercase; margin: 0 auto 15px auto; display: table; }
+        .time-col { flex: 1; text-align: center; }
+        .time-nome { font-size: 1.2rem; font-weight: 700; margin-bottom: 10px; color: white; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .score-num { font-size: 3rem; font-weight: 800; color: #38bdf8; text-shadow: 0 0 20px rgba(56,189,248,0.4); font-family: monospace; }
+        .vs-label { font-size: 0.9rem; font-weight: 700; color: var(--text-muted); padding: 0 15px; }
+
+        .grid-controles { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-top: 20px; }
+        .controle-time { background: rgba(255,255,255,0.03); padding: 15px; border-radius: 14px; border: 1px solid rgba(255,255,255,0.05); text-align: center; }
+        .controle-time p { font-size: 0.8rem; font-weight: 700; text-transform: uppercase; color: var(--text-muted); margin-bottom: 12px; }
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+
+        .share-container { text-align: center; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        #qrcode-wrapper { background: white; padding: 14px; border-radius: 16px; display: inline-block; box-shadow: 0 10px 30px rgba(0,0,0,0.4); margin-top: 10px; min-width: 228px; min-height: 228px; }
+        #qrcode-canvas { display: block; margin: 0 auto; }
+
+        .status-encerrado { display: none; background: #ef4444; color: white; padding: 14px; border-radius: 12px; font-weight: 800; font-size: 1rem; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 0.05em; box-shadow: 0 0 20px rgba(239, 68, 68, 0.5); }
+
+        .historico-lista { width: 100%; margin-top: 15px; text-align: left; max-height: 300px; overflow-y: auto; padding-right: 5px; }
+        .historico-item { background: rgba(15, 23, 42, 0.5); padding: 12px 16px; border-radius: 12px; margin-bottom: 10px; border: 1px solid rgba(255,255,255,0.05); display: flex; justify-content: space-between; align-items: center; gap: 15px; }
+        .historico-info { display: flex; flex-direction: column; flex: 1; min-width: 0; }
+        .historico-mod { font-size: 0.75rem; text-transform: uppercase; color: #60a5fa; font-weight: 700; }
+        .historico-times { font-size: 0.9rem; font-weight: 600; color: white; margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .historico-placar-box { display: flex; align-items: center; gap: 15px; }
+        .historico-placar { font-family: monospace; font-size: 1.1rem; font-weight: 800; color: var(--accent); }
+        
+        .btn-deletar-item { background: rgba(239, 68, 68, 0.15); border: 1px solid rgba(239, 68, 68, 0.3); color: #f87171; width: 34px; height: 34px; border-radius: 8px; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: all 0.2s; font-size: 0.9rem; }
+        .btn-deletar-item:hover { background: rgba(239, 68, 68, 0.35); color: #ffffff; transform: scale(1.05); }
+
+        .hidden { display: none !important; }
+        @media (max-width: 500px) { .form-row, .grid-controles { grid-template-columns: 1fr; } .form-group.full { grid-column: span 1; } }
     </style>
 </head>
 <body>
 
-    <div class="login-card">
-        <div class="logo-area">
-            <h1>Info<span>Sport</span></h1>
-            <p>Painel de Arbitragem Escolar</p>
+    <main id="containerCriar" class="card hidden">
+        <h3>⚙️ Nova Partida</h3>
+        <div class="form-group full">
+            <label for="inputModalidade">Modalidade Esportiva</label>
+            <input type="text" id="inputModalidade" placeholder="Ex: Futsal Masculino">
+        </div>
+        <div class="form-row">
+            <div class="form-group">
+                <label for="inputTimeA">Time de Casa</label>
+                <input type="text" id="inputTimeA" placeholder="Ex: Informática">
+            </div>
+            <div class="form-group">
+                <label for="inputTimeB">Time Visitante</label>
+                <input type="text" id="inputTimeB" placeholder="Ex: Mecânica">
+            </div>
+        </div>
+        <button class="btn btn-primary" onclick="inicializarPartida()">🚀 Lançar Painel Oficial</button>
+    </main>
+
+    <main id="containerMonitor" class="card hidden">
+        <div id="bannerEncerrado" class="status-encerrado">⚠️ Partida Encerrada pelo Árbitro!</div>
+
+        <h3>📊 Monitor de Controle</h3>
+        <div class="badge-mod" id="modalidadeDisplay">Competição</div>
+        
+        <div class="placar-box">
+            <div class="time-col">
+                <div class="time-nome" id="nomeTimeADisplay">---</div>
+                <div class="score-num" id="pontosADisplay">0</div>
+            </div>
+            <div class="vs-label">VS</div>
+            <div class="time-col">
+                <div class="time-nome" id="nomeTimeBDisplay">---</div>
+                <div class="score-num" id="pontosBDisplay">0</div>
+            </div>
         </div>
 
-        <div class="form-group">
-            <h3>🔐 Acesso do Árbitro</h3>
-            <label for="chaveArbitro">Chave de Segurança (Opcional)</label>
-            <input type="password" id="chaveArbitro" placeholder="Clique abaixo para entrar">
+        <button id="btnHistorico" class="btn btn-secondary" style="margin-top: 15px;" onclick="alternarVisibilidadeHistorico()">📋 Ver Jogos Anteriores</button>
+        
+        <div id="secaoHistorico" class="hidden" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
+            <h4 style="font-size: 1rem; color: var(--text-muted); margin-bottom: 10px; text-align: left;">Partidas Encerradas</h4>
+            <div id="listaHistorico" class="historico-lista">
+                <p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogo registrado ainda.</p>
+            </div>
         </div>
+    </main>
 
-        <button class="btn" onclick="entrarComoArbitro()">Entrar no Painel 🛠️</button>
-    </div>
+    <main id="containerMesa" class="card hidden">
+        <h3>🎛️ Mesa de Controle do Árbitro</h3>
+        <div class="grid-controles">
+            <div class="controle-time">
+                <p id="labelCtrlA">Time A</p>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="alterarPontos('A', 1)">+ 1 Ponto</button>
+                    <button class="btn btn-secondary" onclick="alterarPontos('A', -1)">- 1 Ponto</button>
+                </div>
+            </div>
+            <div class="controle-time">
+                <p id="labelCtrlB">Time B</p>
+                <div class="btn-group">
+                    <button class="btn btn-success" onclick="alterarPontos('B', 1)">+ 1 Ponto</button>
+                    <button class="btn btn-secondary" onclick="alterarPontos('B', -1)">- 1 Ponto</button>
+                </div>
+            </div>
+        </div>
+        <button class="btn btn-secondary" style="margin-top: 25px; background: rgba(239,68,68,0.2); color: #f87171; font-weight: 700;" onclick="encerrarPartida()">🏁 Encerrar e Salvar Partida</button>
+    </main>
+
+    <main id="containerCompartilhar" class="card hidden">
+        <h3>📱 Link da Torcida (Alunos)</h3>
+        <div class="share-container">
+            <p style="color: var(--text-muted); font-size: 0.9rem;">Os alunos podem entrar escaneando o QR Code abaixo:</p>
+            <div id="qrcode-wrapper">
+                <canvas id="qrcode-canvas"></canvas>
+            </div>
+        </div>
+    </main>
 
     <script>
-        function entrarComoArbitro() {
+        const urlParams = new URLSearchParams(window.location.search);
+        const modoUrl = urlParams.get('modo'); 
+        let salaId = urlParams.get('sala');
+
+        const ABLY_KEY = "O94vOA.ELR57w:ikfHvNhNbsH7N3DVDkwSsG5zlE33TuF-DL4B6Z8d8Ho"; 
+        let ably, canalAbly, canalHistorico;
+        let pontuacao = { A: 0, B: 0 };
+
+        window.onload = function() {
+            if (modoUrl === 'arbitro') {
+                if (!salaId) {
+                    document.getElementById('containerCriar').classList.remove('hidden');
+                } else {
+                    conectarAoCanal();
+                    renderizarPaineisArbitro();
+                }
+            } else if (modoUrl === 'publico' && salaId) {
+                conectarAoCanal();
+                document.getElementById('containerMonitor').classList.remove('hidden');
+                carregarHistoricoLocal();
+            } else {
+                alert("Acesso inválido. Redirecionando para a página inicial.");
+                window.location.href = "index.html";
+            }
+        };
+
+        function inicializarPartida() {
+            pontuacao.A = 0;
+            pontuacao.B = 0;
+            document.getElementById('pontosADisplay').textContent = "0";
+            document.getElementById('pontosBDisplay').textContent = "0";
+            document.getElementById('bannerEncerrado').style.display = 'none';
+
+            const timestampUnico = Date.now().toString().slice(-5);
+            const aleatorioUnico = Math.floor(100 + Math.random() * 900);
+            salaId = "jogo_" + timestampUnico + aleatorioUnico;
             
-            window.location.href = "jogo.html?modo=arbitro";
+            conectarAoCanal();
+
+            const mod = document.getElementById('inputModalidade').value.trim() || "Competição";
+            const timeA = document.getElementById('inputTimeA').value.trim() || "Time A";
+            const timeB = document.getElementById('inputTimeB').value.trim() || "Time B";
+
+            document.getElementById('modalidadeDisplay').textContent = mod;
+            document.getElementById('nomeTimeADisplay').textContent = timeA;
+            document.getElementById('nomeTimeBDisplay').textContent = timeB;
+
+            document.getElementById('labelCtrlA').textContent = timeA;
+            document.getElementById('labelCtrlB').textContent = timeB;
+
+            document.getElementById('containerCriar').classList.add('hidden');
+            renderizarPaineisArbitro();
+
+            setTimeout(() => {
+                canalAbly.publish('atualizacao', { modalidade: mod, timeA: timeA, timeB: timeB, pA: 0, pB: 0, status: 'ativo' });
+            }, 600);
         }
 
-        
-        document.getElementById('chaveArbitro').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') entrarComoArbitro();
-        });
+        function conectarAoCanal() {
+            if (ably && canalAbly) {
+                canalAbly.unsubscribe();
+            }
+
+            ably = new Ably.Realtime({ key: ABLY_KEY });
+            
+           
+            canalAbly = ably.channels.get(salaId, { params: { rewind: '1' } });
+            canalHistorico = ably.channels.get('infosport_historico_global');
+
+            canalAbly.subscribe('atualizacao', (msg) => {
+                const dados = msg.data;
+                document.getElementById('modalidadeDisplay').textContent = dados.modalidade;
+                document.getElementById('nomeTimeADisplay').textContent = dados.timeA;
+                document.getElementById('nomeTimeBDisplay').textContent = dados.timeB;
+                document.getElementById('pontosADisplay').textContent = dados.pA;
+                document.getElementById('pontosBDisplay').textContent = dados.pB;
+                
+                pontuacao.A = dados.pA;
+                pontuacao.B = dados.pB; 
+
+                if (modoUrl === 'arbitro') {
+                    document.getElementById('labelCtrlA').textContent = dados.timeA;
+                    document.getElementById('labelCtrlB').textContent = dados.timeB;
+                }
+
+                if (dados.status === 'encerrado') {
+                    document.getElementById('bannerEncerrado').style.display = 'block';
+                } else {
+                    document.getElementById('bannerEncerrado').style.display = 'none';
+                }
+            });
+
+            canalHistorico.subscribe('partida_salva', (msg) => {
+                salvarNoHistoricoLocal(msg.data);
+            });
+
+            canalHistorico.subscribe('item_deletado', (msg) => {
+                removerDoHistoricoLocal(msg.data.id);
+            });
+
+            setInterval(() => {
+                let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
+                if (modoUrl === 'arbitro' && deletados.length > 0) {
+                    deletados.forEach(id => {
+                        canalHistorico.publish('item_deletado', { id: id });
+                    });
+                }
+            }, 5000);
+        }
+
+        function renderizarPaineisArbitro() {
+            document.getElementById('containerMonitor').classList.remove('hidden');
+            document.getElementById('containerMesa').classList.remove('hidden');
+            document.getElementById('containerCompartilhar').classList.remove('hidden');
+
+            let urlCompleta = window.location.href.split('?')[0];
+            const urlTorcida = `${urlCompleta}?sala=${encodeURIComponent(salaId)}&modo=publico`;
+            
+            const canvas = document.getElementById('qrcode-canvas');
+            const context = canvas.getContext('2d');
+            context.clearRect(0, 0, canvas.width, canvas.height);
+
+            new QRious({
+                element: canvas,
+                value: urlTorcida,
+                size: 210,
+                background: '#ffffff',
+                foreground: '#0f172a',
+                level: 'H'
+            });
+        }
+
+        function alterarPontos(time, valor) {
+            if (time === 'A') {
+                pontuacao.A = Math.max(0, pontuacao.A + valor);
+            } else {
+                pontuacao.B = Math.max(0, pontuacao.B + valor);
+            }
+
+            canalAbly.publish('atualizacao', {
+                modalidade: document.getElementById('modalidadeDisplay').textContent,
+                timeA: document.getElementById('nomeTimeADisplay').textContent,
+                timeB: document.getElementById('nomeTimeBDisplay').textContent,
+                pA: pontuacao.A,
+                pB: pontuacao.B,
+                status: 'ativo'
+            });
+        }
+
+        function encerrarPartida() {
+            if (confirm("Deseja encerrar e SALVAR esta partida no histórico?")) {
+                const dadosFinais = {
+                    modalidade: document.getElementById('modalidadeDisplay').textContent,
+                    timeA: document.getElementById('nomeTimeADisplay').textContent,
+                    timeB: document.getElementById('nomeTimeBDisplay').textContent,
+                    pA: pontuacao.A,
+                    pB: pontuacao.B,
+                    id: salaId
+                };
+
+                canalAbly.publish('atualizacao', {
+                    modalidade: dadosFinais.modalidade,
+                    timeA: dadosFinais.timeA,
+                    timeB: dadosFinais.timeB,
+                    pA: dadosFinais.pA,
+                    pB: dadosFinais.pB,
+                    status: 'encerrado'
+                });
+
+                canalHistorico.publish('partida_salva', dadosFinais);
+
+                setTimeout(() => {
+                    window.location.href = "index.html";
+                }, 1500); 
+            }
+        }
+
+        function alternarVisibilidadeHistorico() {
+            const secao = document.getElementById('secaoHistorico');
+            const btn = document.getElementById('btnHistorico');
+            if (secao.classList.contains('hidden')) {
+                secao.classList.remove('hidden');
+                btn.textContent = " Ocultar Jogos Anteriores";
+                carregarHistoricoLocal();
+            } else {
+                secao.classList.add('hidden');
+                btn.textContent = "📋 Ver Jogos Anteriores";
+            }
+        }
+
+        function salvarNoHistoricoLocal(partida) {
+            let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+            if (deletadosGlobais.includes(partida.id)) return;
+
+            let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+            if (!historico.some(item => item.id === partida.id)) {
+                historico.unshift(partida);
+                localStorage.setItem('infosport_historico', JSON.stringify(historico));
+                carregarHistoricoLocal();
+            }
+        }
+
+        function removerDoHistoricoLocal(idDeletar) {
+            if (idDeletar !== salaId) {
+                let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+                if (!deletadosGlobais.includes(idDeletar)) {
+                    deletadosGlobais.push(idDeletar);
+                    localStorage.setItem('infosport_deletados_lista', JSON.stringify(deletadosGlobais));
+                }
+            }
+
+            let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+            historico = historico.filter(jogo => jogo.id !== idDeletar);
+            localStorage.setItem('infosport_historico', JSON.stringify(historico));
+            carregarHistoricoLocal();
+        }
+
+        function carregarHistoricoLocal() {
+            const listaDiv = document.getElementById('listaHistorico');
+            let historico = JSON.parse(localStorage.getItem('infosport_historico')) || [];
+            let deletadosGlobais = JSON.parse(localStorage.getItem('infosport_deletados_lista')) || [];
+
+            historico = historico.filter(jogo => !deletadosGlobais.includes(jogo.id));
+
+            if (historico.length === 0) {
+                listaDiv.innerHTML = `<p style="color: var(--text-muted); font-size: 0.85rem; text-align: center; padding: 10px;">Nenhum jogo registrado ainda.</p>`;
+                return;
+            }
+
+            listaDiv.innerHTML = "";
+            historico.forEach(jogo => {
+                const item = document.createElement('div');
+                item.className = 'historico-item';
+                
+                let conteudoHTML = `
+                    <div class="historico-info">
+                        <span class="historico-mod">${escapeHTML(jogo.modalidade)}</span>
+                        <span class="historico-times">${escapeHTML(jogo.timeA)} vs ${escapeHTML(jogo.timeB)}</span>
+                    </div>
+                    <div class="historico-placar-box">
+                        <div class="historico-placar">${jogo.pA} - ${jogo.pB}</div>
+                `;
+
+                if (modoUrl === 'arbitro') {
+                    conteudoHTML += `
+                        <button class="btn-deletar-item" title="Apagar esta partida" onclick="solicitarDeletarPartida('${jogo.id}')">🗑️</button>
+                    `;
+                }
+
+                conteudoHTML += `</div>`;
+                item.innerHTML = conteudoHTML;
+                listaDiv.appendChild(item);
+            });
+        }
+
+        function solicitarDeletarPartida(idPartida) {
+            if (confirm("Quer mesmo apagar este jogo específico do histórico?")) {
+                let deletados = JSON.parse(localStorage.getItem('infosport_deletados')) || [];
+                if (!deletados.includes(idPartida)) deletados.push(idPartida);
+                localStorage.setItem('infosport_deletados', JSON.stringify(deletados));
+
+                canalHistorico.publish('item_deletado', { id: idPartida });
+                removerDoHistoricoLocal(idPartida);
+            }
+        }
+
+        function escapeHTML(str) {
+            return str.replace(/[&<>'"]/g, 
+                tag => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;' }[tag] || tag)
+            );
+        }
     </script>
 </body>
 </html>
